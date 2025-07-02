@@ -152,7 +152,7 @@
     <main class="grid">
         <div class="card">
             <a href="resume/Resume_auni.pdf" target="_blank">
-                <img src="resume/Auni.jpg" alt="Auni Najibah Binti Ismail">
+                <img src="resume/Hannah.jpg" alt="Auni Najibah Binti Ismail">
             </a>
             <div class="card-content">
                 <h2>Auni Najibah Binti Ismail</h2>
