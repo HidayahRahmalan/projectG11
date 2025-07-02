@@ -257,10 +257,11 @@ $result = $stmt->get_result();
 <header>
     <div class="logo" tabindex="0">MaintainEase</div>
     <nav>
-        <a href="home.php">Home</a>
+        <a href="index.php">Home</a>
         <a href="insertmaintenance.php">Submit Request</a>
         <a href="request_list.php" class="active" aria-current="page">My Requests</a>
         <a href="profile.php">Profile</a>
+        <a href="about_us.php">About Us</a>
         <a href="logout.php">Sign Out</a>
     </nav>
 </header>
