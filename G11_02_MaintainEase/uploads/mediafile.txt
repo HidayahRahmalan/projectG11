@@ -1,0 +1,1 @@
+This folder is to save media(videos) so it can be fetched via filepath
