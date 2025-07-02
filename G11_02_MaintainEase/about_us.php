@@ -67,8 +67,8 @@
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
             width: 90%;
             max-width: 1200px;
             margin: 2rem auto;
@@ -93,7 +93,14 @@
             object-fit: cover;
         }
         .card-content {
-            padding: 1.25rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        .card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-bottom: 1px solid #ddd;
         }
         .card h2 {
             font-size: 1.25rem;
@@ -121,13 +128,74 @@
     <section class="team-section">
         <img class="team-image" src="images/kamiGeng.jpeg" alt="Team Member">
         <p style="margin-top: 1rem; font-weight: 600; color: white;">Student BITD Gempak</p>
+        <a href="index.php" style="
+        margin-top: 1rem;
+        width: 280px;
+        display: block;
+        text-align: center;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--main-color);
+        color: white;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    "
+    onmouseover="this.style.backgroundColor='#357ABD'; this.style.transform='translateY(-2px)';"
+    onmouseout="this.style.backgroundColor='var(--main-color)'; this.style.transform='none';">
+        Explore MaintainEase
+    </a>
     </section>
-
+    
     <main class="grid">
- 
- 
- 
+        <div class="card">
+            <a href="resume/Resume_auni.pdf" target="_blank">
+                <img src="resume/Auni.jpg" alt="Auni Najibah Binti Ismail">
+            </a>
+            <div class="card-content">
+                <h2>Auni Najibah Binti Ismail</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <a href="resume/Resume_bhuva.pdf" target="_blank">
+                <img src="resume/Bhuva.jpg" alt="Bhuvanasri A/P Sritharan">
+            </a>
+            <div class="card-content">
+                <h2>Bhuvanasri A/P Sritharan</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <a href="resume/Resume_hannah.pdf" target="_blank">
+                <img src="resume/Hannah.jpg" alt="Nurin Hannah Binti Zamberi">
+            </a>
+            <div class="card-content">
+                <h2>Nurin Hannah Binti Zamberi</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <a href="resume/Resume_nadhira.pdf" target="_blank">
+                <img src="resume/Nahdhira.jpg" alt="Nurnadhira Binti Mohd Faisol">
+            </a>
+            <div class="card-content">
+                <h2>Nurnadhira Binti Mohd Faisol</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <a href="resume/Resume_shahirah.pdf" target="_blank">
+                <img src="resume/shahirah.jpg" alt="Nur Shahirah Binti Rahmat">
+            </a>
+            <div class="card-content">
+                <h2>Nur Shahirah Binti Rahmat</h2>
+            </div>
+        </div>
     </main>
+
 
     <footer>
         &copy; <?= date('Y') ?> Project Team. All rights reserved.
