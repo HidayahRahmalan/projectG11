@@ -274,7 +274,7 @@ function getMimeType($extension) {
 <header>
     <div class="logo" tabindex="0">MaintainEase</div>
     <nav aria-label="Primary navigation">
-        <a href="home.php" class="active" aria-current="page">Home</a>
+        <a href="index.php" class="active" aria-current="page">Home</a>
         <?php if ($_SESSION['role'] === 'staff'): ?>
             <a href="insertmaintenance.php">Requests</a>
         <?php elseif ($_SESSION['role'] === 'admin'): ?>
@@ -282,6 +282,7 @@ function getMimeType($extension) {
             <a href="viewquery.php">Maintenance List</a>
         <?php endif; ?>
         <a href="profile.php">Profile</a>
+        <a href="about_us.php">About Us</a>
         <a href="logout.php">Sign Out</a>
     </nav>
 </header>
