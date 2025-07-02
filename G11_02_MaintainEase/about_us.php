@@ -117,9 +117,56 @@
             font-size: 0.9rem;
             color: #ffffffcc;
         }
+        .audio-wrapper {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            pointer-events: none; /* disables direct interaction */
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+        .audio-wrapper.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        audio {
+            width: 300px;
+            height: 35px;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Floating music toggle button */
+        #toggle-audio {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--main-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            z-index: 1001;
+        }
+        #toggle-audio:hover {
+            background-color: #357ABD;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
+    <div class="audio-wrapper">
+        <audio id="background-audio" src="Sunset_Drive.mp3"></audio>
+    </div>
+    <button id="toggle-audio" title="Play/Pause Music">🎵</button>
     <header>
         <h1>Welcome to Our Project Showcase</h1>
         <p>Explore our featured projects and meet our wonderful team</p>
@@ -200,5 +247,41 @@
     <footer>
         &copy; <?= date('Y') ?> Project Team. All rights reserved.
     </footer>
+
+    <script>
+        const audio = document.getElementById('background-audio');
+        const toggleBtn = document.getElementById('toggle-audio');
+        const audioWrapper = document.querySelector('.audio-wrapper');
+
+        // Fade in audio element
+        window.addEventListener('load', () => {
+            audioWrapper.classList.add('show');
+            // Attempt to autoplay (may be blocked in some browsers)
+            audio.volume = 0;
+            audio.play().then(() => {
+                // Gradually increase volume for fade-in effect
+                let vol = 0;
+                const fade = setInterval(() => {
+                    if (vol < 1) {
+                        vol += 0.05;
+                        audio.volume = Math.min(vol, 1);
+                    } else {
+                        clearInterval(fade);
+                    }
+                }, 200);
+            }).catch(() => {
+                // If autoplay blocked, do nothing
+            });
+        });
+
+        // Toggle play/pause on button click
+        toggleBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        });
+    </script>
 </body>
 </html>
