@@ -189,10 +189,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <header>
     <div class="logo" tabindex="0">MaintainEase</div>
     <nav aria-label="Primary navigation">
-        <a href="home.php">Home</a>
+        <a href="index.php">Home</a>
         <a href="admin_dashboard.php">Users</a>
         <a href="viewquery.php">Maintenance List</a>
         <a href="profile.php">Profile</a>
+        <a href="about_us.php">About Us</a>
         <a href="logout.php">Sign Out</a>
     </nav>
 </header>
