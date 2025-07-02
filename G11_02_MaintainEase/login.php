@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $_SESSION['user_id'] = $user['user_id'];
               $_SESSION['name'] = $user['name'];
               $_SESSION['role'] = $user['role'];
-              header('Location: home.php');
+              header('Location: index.php');
               exit();
           } else {
               $error = 'Incorrect password.';
@@ -175,7 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <header>
         <div class="logo" tabindex="0">MaintainEase</div>
         <nav aria-label="Primary navigation">
-            <a href="home.php" class="active" aria-current="page">Home</a>
+            <a href="index.php" class="active" aria-current="page">Home</a>
+            <a href="about_us.php">About Us</a>
             <a href="register.php">Register</a>
         </nav>
     </header>
