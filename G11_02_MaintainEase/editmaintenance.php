@@ -257,7 +257,7 @@ $media = $media_result->fetch_assoc();
 <header>
         <div class="logo" tabindex="0">MaintainEase</div>
         <nav aria-label="Primary navigation">
-            <a href="home.php" class="active" aria-current="page">Home</a>
+            <a href="index.php" class="active" aria-current="page">Home</a>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php if ($_SESSION['role'] === 'staff'): ?>
@@ -269,8 +269,10 @@ $media = $media_result->fetch_assoc();
                 <?php endif; ?>
 
                 <a href="profile.php">Profile</a>
+                <a href="about_us.php">About Us</a>
                 <a href="logout.php">Sign Out</a>
             <?php else: ?>
+                <a href="about_us.php">About Us</a>
                 <a href="login.php">Sign In</a>
             <?php endif; ?>
         </nav>
