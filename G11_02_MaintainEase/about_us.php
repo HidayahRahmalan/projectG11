@@ -226,7 +226,7 @@
 
         <div class="card">
             <a href="resume/Resume_nadhira.pdf" target="_blank">
-                <img src="resume/Nahdhira.jpg" alt="Nurnadhira Binti Mohd Faisol">
+                <img src="resume/Nadhira.jpg" alt="Nurnadhira Binti Mohd Faisol">
             </a>
             <div class="card-content">
                 <h2>Nurnadhira Binti Mohd Faisol</h2>
