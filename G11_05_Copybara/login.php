@@ -1,15 +1,65 @@
 <?php
 require 'conn.php';
-
 session_start();
-$role = $_SESSION['role'] ?? 'guest';
+$errors = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+
+    if (empty($email) || empty($password)) {
+        $errors[] = "All fields are required.";
+    } else {
+        $stmt = $conn->prepare("SELECT user_id, name, password, role_id, is_active FROM sys_user WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($user_id, $name, $stored_password, $role_id, $is_active);
+            $stmt->fetch();
+
+            if (!$is_active) {
+                $errors[] = "Your account is inactive.";
+            } elseif ($password === $stored_password) {
+                $_SESSION['user_id'] = $user_id;
+                $_SESSION['name'] = $name;
+                $_SESSION['role'] = $role_id;
+
+                switch ($role_id) {
+                    case 1:
+                        header("Location: admin/admin_dashboard.php");
+                        break;
+                    case 2:
+                        header("Location: technician/tech_dashboard.php");
+                        break;
+                    case 3:
+                        header("Location: staff/staff_dashboard.php");
+                        break;
+                    default:
+                        $errors[] = "Unknown role. Please contact the administrator.";
+                        session_destroy();
+                        exit;
+                }
+                exit;
+            } else {
+                $errors[] = "Invalid credentials.";
+            }
+        } else {
+            $errors[] = "User not found.";
+        }
+
+        $stmt->close();
+    }
+}
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MRS - Welcome</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Login - MRS</title>
     <style>
         * {
             box-sizing: border-box;
@@ -28,6 +78,7 @@ body {
     justify-content: space-between;
     color: #333;
 }
+
 
         header {
             background-color: #2c3e50;
@@ -91,48 +142,27 @@ body {
             padding: 1rem;
             background-color: #f1f1f1;
             font-size: 14px;
-       }
-.main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.about-link {
-    margin-top: 20px;
-    text-align: center;
-}
-.button-secondary {
-    background-color: #000;
-    color: #fff;
-}
-
-.button-secondary:hover {
-    background-color: #333;
-}
-
-
+        }
     </style>
 </head>
 <body>
 
 <header>Maintenance Report System</header>
-<main>
-    <div class="main-content">
-        <div class="login-container">
-            <h2>Welcome to Maintenance Report System</h2>
-            <p>Please register or log in to continue:</p>
-            <a href="register.php" class="button">Register</a>
-            <a href="login.php" class="button">Login</a>
-        </div>
 
-        <!-- About Us button -->
-<div class="about-link">
-    <a href="indexmadam.php" class="button button-secondary">About Us</a>
-</div>
+<main>
+    <div class="login-container">
+        <h2>Log In</h2>
+        <?php foreach ($errors as $error): ?>
+            <p style="color:red;"><?= htmlspecialchars($error) ?></p>
+        <?php endforeach; ?>
+        <form method="post">
+            <input type="email" name="email" placeholder="Email" required><br><br>
+            <input type="password" name="password" placeholder="Password" required><br><br>
+            <button type="submit" class="button">Login</button>
+        </form>
+                <p>No account? <a href="register.php">Register</a></p>
     </div>
 </main>
-
 
 <footer>&copy; 2025 RMS. All rights reserved.</footer>
 
