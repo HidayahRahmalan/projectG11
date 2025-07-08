@@ -333,6 +333,12 @@ $stmt->close();
                                     <input type="text" class="form-control" value="<?= date('d-m-Y H:i', strtotime($submitInfo['Action_time'] ?? 'Unknown')); ?>" readonly>
                                 </div>
 
+                                <?php if ($report['Urgency_level'] == 'Critical'): ?>
+                                    <div class="form-group">
+                                        <small class="text-muted" style="margin-bottom: 10px; margin-left: 10px;">This same issue has also been reported by other.</small>
+                                    </div>
+                                <?php endif; ?>
+
                                 <!-- Proof -->
                                 <div class="form-group">
                                     <label>Proof</label>
