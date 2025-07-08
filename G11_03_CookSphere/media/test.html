@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Step-by-Step Voice Recipe Upload</title>
+  <style>
+    body {
+      background: #fffdf7;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 700px;
+    }
+
+    h2 {
+      color: #e67e22;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .step-box {
+      margin-top: 25px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      color: #444;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .btn {
+      margin-top: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .start-btn {
+      background-color: #27ae60;
+      color: white;
+    }
+
+    .next-btn {
+      background-color: #e67e22;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🍳 Step-by-Step Voice Recipe Upload</h2>
+
+    <label for="langSelect">Language / Bahasa</label>
+    <select id="langSelect">
+      <option value="en-US">English</option>
+      <option value="ms-MY">Bahasa Melayu</option>
+    </select>
+
+    <form id="stepForm">
+      <input type="hidden" name="RecipeID" value="1" /> <!-- Static ID for now -->
+
+      <div class="step-box" id="stepContainer">
+        <label>Step <span id="stepNumber">1</span></label>
+
+        <label>Instruction</label>
+        <textarea name="Instruction" id="instruction" required></textarea>
+
+        <button type="button" class="btn start-btn" onclick="startVoice('instruction')">🎤 Speak</button>
+
+        <label>Upload Image</label>
+        <input type="file" name="StepImage" accept="image/*" />
+
+        <label>Upload Video</label>
+        <input type="file" name="StepVideo" accept="video/*" />
+
+        <button type="button" class="btn next-btn" onclick="nextStep()">✅ Done & Add Next Step</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let stepCount = 1;
+
+    function getSelectedLang() {
+      return document.getElementById('langSelect').value;
+    }
+
+    function startVoice(targetId) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = getSelectedLang();
+
+      recognition.onstart = () => {
+        alert('🎤 Start speaking your instruction now...');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        target.value += (target.value ? ' ' : '') + transcript;
+      };
+
+      recognition.onerror = (event) => {
+        alert('❌ Speech error: ' + event.error);
+      };
+
+      recognition.start();
+    }
+
+    function nextStep() {
+      stepCount++;
+
+      const stepDiv = document.createElement('div');
+      stepDiv.className = 'step-box';
+
+      stepDiv.innerHTML = `
+        <label>Step ${stepCount}</label>
+
+        <label>Instruction</label>
+        <textarea name="Instruction" required></textarea>
+        <button type="button" class="btn start-btn" onclick="startVoiceDynamic(this)">🎤 Speak</button>
+
+        <label>Upload Image</label>
+        <input type="file" name="StepImage" accept="image/*" />
+
+        <label>Upload Video</label>
+        <input type="file" name="StepVideo" accept="video/*" />
+
+        <button type="button" class="btn next-btn" onclick="nextStep()">✅ Done & Add Next Step</button>
+      `;
+
+      document.getElementById('stepContainer').appendChild(stepDiv);
+      document.getElementById('stepNumber').innerText = stepCount;
+    }
+
+    function startVoiceDynamic(button) {
+      const textarea = button.previousElementSibling;
+      if (!textarea) return;
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = getSelectedLang();
+
+      recognition.onstart = () => {
+        alert('🎤 Speak now for this step...');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        textarea.value += (textarea.value ? ' ' : '') + transcript;
+      };
+
+      recognition.onerror = (event) => {
+        alert('❌ Speech error: ' + event.error);
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
