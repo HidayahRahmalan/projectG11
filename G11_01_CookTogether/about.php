@@ -277,7 +277,7 @@ require_once 'connection.php';
                 <!-- Team Member 4 -->
                 <div class="team-member">
                     <div class="team-member-header"></div>
-                    <img src="img/izzati.jpg" alt="Nur Izzati Izwani Binti Edi Raof">
+                    <img src="img/izzati.jpeg" alt="Nur Izzati Izwani Binti Edi Raof">
                     <div class="team-member--body">
                         <h3>Nur Izzati Izwani Binti Edi Raof</h3>
                         <p class="role">Multimedia Handler</p>
@@ -289,7 +289,7 @@ require_once 'connection.php';
                  <!-- Team Member 5 -->
                  <div class="team-member">
                     <div class="team-member-header"></div>
-                    <img src="img/wei.jpg" alt="Tan Wei Zhao">
+                    <img src="img/wei.jpeg" alt="Tan Wei Zhao">
                     <div class="team-member-body">
                         <h3>Tan Wei Zhao</h3>
                         <p class="role">Frontend Developer</p>
