@@ -241,7 +241,29 @@ $conn->close();
             <p class="recipe-description"><?php echo nl2br(htmlspecialchars($recipe['description'])); ?></p>
         </header>
 
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $recipe['author_id']): ?><div class="author-actions" style="margin-bottom: 2rem; padding: 1rem; background: #f0f2f5; border-radius: 10px; display: flex; align-items: center; gap: 1rem; border: 1px solid #e1e8ed;"><h4 style="margin: 0; color: #555;">Author Actions:</h4><a href="edit-recipe.php?id=<?php echo $recipe['recipe_id']; ?>" class="submit-btn" style="background: #ffc107; color: #212529; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Edit Recipe</a><form action="delete-recipe.php" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this recipe? This action cannot be undone.');" style="margin: 0;"><input type="hidden" name="recipe_id" value="<?php echo $recipe['recipe_id']; ?>"><button type="submit" class="submit-btn" style="background: #dc3545; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Delete Recipe</button></form></div><?php endif; ?>
+        <!-- =================================================================== -->
+        <!-- ============== START: AUTHOR ACTIONS SECTION (MODIFIED) ============= -->
+        <!-- =================================================================== -->
+        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $recipe['author_id']): ?>
+            <div class="author-actions" style="margin-bottom: 2rem; padding: 1rem; background: #f0f2f5; border-radius: 10px; display: flex; align-items: center; gap: 1rem; border: 1px solid #e1e8ed;">
+                <h4 style="margin: 0; color: #555;">Author Actions:</h4>
+                
+                <!-- Edit button will always show for the author -->
+                <a href="edit-recipe.php?id=<?php echo $recipe['recipe_id']; ?>" class="submit-btn" style="background: #ffc107; color: #212529; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Edit Recipe</a>
+                
+                <!-- NEW CONDITION: Only show the Delete button if there are NO reviews -->
+                <?php if (empty($reviews)): ?>
+                    <form action="delete-recipe.php" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this recipe? This action cannot be undone.');" style="margin: 0;">
+                        <input type="hidden" name="recipe_id" value="<?php echo $recipe['recipe_id']; ?>">
+                        <button type="submit" class="submit-btn" style="background: #dc3545; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Delete Recipe</button>
+                    </form>
+                <?php endif; ?>
+
+            </div>
+        <?php endif; ?>
+        <!-- =================================================================== -->
+        <!-- =============== END: AUTHOR ACTIONS SECTION (MODIFIED) ============== -->
+        <!-- =================================================================== -->
 
         <div class="media-gallery"><?php foreach ($recipe_media as $media): ?><?php if ($media['media_type'] == 'image'): ?><img src="<?php echo htmlspecialchars($media['file_path']); ?>" alt="Recipe media for <?php echo htmlspecialchars($recipe['title']); ?>" class="recipe-main-image"><?php elseif ($media['media_type'] == 'video'): ?><div class="video-section"><video controls width="100%"><source src="<?php echo htmlspecialchars($media['file_path']); ?>" type="video/mp4">Your browser does not support the video tag.</video></div><?php endif; ?><?php endforeach; ?></div>
 
@@ -385,5 +407,3 @@ $conn->close();
     </script>
 </body>
 </html>
-
-
