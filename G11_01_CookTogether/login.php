@@ -4,7 +4,7 @@ session_start();
 
 // If the user is already logged in, redirect them to the home page
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: indexCT.php");
+    header("location: index.php");
     exit;
 }
 
@@ -100,9 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <nav class="navbar">
         <div class="nav-container">
-          <a href="indexCT.php" class="logo">🍳 CookTogether</a>
+          <a href="index.php" class="logo">🍳 CookTogether</a>
           <div class="nav-links">
-            <a class="nav-link" href="indexCT.php">Home</a>
+            <a class="nav-link" href="index.php">Home</a>
             <a class="nav-link" href="about.php">About Us</a>
             <a class="nav-link" href="login.php">Login</a>
           </div>
