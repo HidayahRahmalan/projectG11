@@ -133,9 +133,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <nav class="navbar">
         <div class="nav-container">
-          <a href="indexCT.php" class="logo">🍳 CookTogether</a>
+          <a href="index.php" class="logo">🍳 CookTogether</a>
           <div class="nav-links">
-            <a class="nav-link" href="indexCT.php">Home</a>
+            <a class="nav-link" href="index.php">Home</a>
             <a class="nav-link" href="upload.php">Upload Recipe</a>
             <a class="nav-link" href="login.php">Login</a>
           </div>
