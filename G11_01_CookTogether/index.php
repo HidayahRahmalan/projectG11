@@ -161,9 +161,9 @@ $conn->close();
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <a href="indexCT.php" class="logo">🍳 CookTogether</a>
+            <a href="index.php" class="logo">🍳 CookTogether</a>
             <div class="nav-links">
-                <a class="nav-link active" href="indexCT.php">Home</a>
+                <a class="nav-link active" href="index.php">Home</a>
                 <?php if(isset($_SESSION["loggedin"]) && in_array($_SESSION["role"], ['chef', 'student'])): ?>
                     <a class="nav-link" href="upload.php">Upload Recipe</a>
                 <?php endif; ?>
@@ -190,7 +190,7 @@ $conn->close();
                 <a href="register.php" class="cta-button">Become a Contributor</a>
             </div>
             <br>
-            <form action="indexCT.php" method="GET">
+            <form action="index.php" method="GET">
                 <div class="search-bar" style="position: relative; display: flex; align-items: center;">
                     <input type="text" name="search" id="searchInput" class="search-input" placeholder="Search or use voice..." value="<?php echo htmlspecialchars($search_term); ?>" style="padding-right: 120px;">
                     <div class="voice-controls" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px;">
