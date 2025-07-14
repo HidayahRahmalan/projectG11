@@ -2,7 +2,7 @@
 // --- DATABASE CREDENTIALS ---
 // Replace with your actual database details
 define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'group1');      // Your database username (e.g., 'root')
+define('DB_USERNAME', 'group1');      // Your database username 
 define('DB_PASSWORD', 'abc123');          // Your database password
 define('DB_NAME', 'p25_cooktogether'); // Your database name
 
