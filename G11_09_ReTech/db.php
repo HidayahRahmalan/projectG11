@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";
-$username = "qwerty";      
-$password = "12345";          
+$username = "Querty";      
+$password = "12345!";          
 $dbname = "report"; 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
