@@ -118,7 +118,7 @@
             <!-- Member 1 -->
             <div class="col-md-6 col-lg-5">
                 <div class="profile-card text-center">
-                    <img src="uploads/nabilah.jpg" alt="User 1">
+                    <img src="uploads/nabilah.jpg" alt="Nabilah">
                     <h5 class="mt-3">NABILAH NURIZZATI BINTI AZIZAM</h5>
                     <p class="text-muted mb-1">B032320065</p>
                     <p class="text-muted">System Developer</p>
@@ -132,7 +132,7 @@
             <!-- Member 2 -->
             <div class="col-md-6 col-lg-5">
                 <div class="profile-card text-center">
-                    <img src="uploads/sab.jpg" alt="User 2">
+                    <img src="uploads/sab.jpg" alt="Sabrina">
                     <h5 class="mt-3">NURUL SABRINA BINTI ZULKEPLI</h5>
                     <p class="text-muted mb-1">B032320087</p>
                     <p class="text-muted">Database Specialist</p>
@@ -145,7 +145,7 @@
             <!-- Member 3 -->
             <div class="col-md-6 col-lg-5">
                 <div class="profile-card text-center">
-                    <img src="uploads/azim.jpg" alt="User 3">
+                    <img src="uploads/azim.jpg" alt="Azim">
                     <h5 class="mt-3">ABDUL AZIM BIN SULAIMAN</h5>
                     <p class="text-muted mb-1">B032320001</p>
                     <p class="text-muted">UI/UX Designer</p>
@@ -158,7 +158,7 @@
             <!-- Member 4 -->
             <div class="col-md-6 col-lg-5">
                 <div class="profile-card text-center">
-                    <img src="uploads/foo.jpg" alt="User 4">
+                    <img src="uploads/foo.jpg" alt="Foo">
                     <h5 class="mt-3">FOO YIT POH</h5>
                     <p class="text-muted mb-1">B032210223</p>
                     <p class="text-muted">Multimedia Designer</p>
