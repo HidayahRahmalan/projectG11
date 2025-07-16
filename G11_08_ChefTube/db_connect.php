@@ -6,7 +6,7 @@
 
 // Database configuration
 $db_host = 'localhost';
-$db_name = 'cheftube';
+$db_name = 'p25_cheftube';
 $db_user = 'larry';
 $db_pass = 'larry123';
 $db_port = '3306';
