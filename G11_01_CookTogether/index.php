@@ -2,13 +2,14 @@
 session_start();
 require_once 'connection.php';
 
+// --- PHP logic to fetch data ---
 $available_cuisines = [];
 $sql_cuisines = "SELECT cuisine_id, cuisine_name FROM cuisines ORDER BY cuisine_name ASC";
 if ($result_cuisines = $conn->query($sql_cuisines)) {
     $available_cuisines = $result_cuisines->fetch_all(MYSQLI_ASSOC);
 }
 
-// --- 1. PAGINATION SETUP ---
+// 1. PAGINATION SETUP
 $recipes_per_page = 6;
 $current_page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($current_page < 1) {
@@ -16,27 +17,37 @@ if ($current_page < 1) {
 }
 $offset = ($current_page - 1) * $recipes_per_page;
 
-// --- 2. FILTERING LOGIC ---
+// 2. FILTERING LOGIC
 $search_term = $_GET['search'] ?? '';
 $cuisine_filter = $_GET['cuisine'] ?? '';
 $diet_filter = $_GET['diet'] ?? '';
 $difficulty_filter = $_GET['difficulty'] ?? '';
-
 $author_role_filter = $_GET['author_role'] ?? '';
 
-// --- 3. DYNAMICALLY BUILD THE WHERE CLAUSE ---
+// 3. DYNAMICALLY BUILD THE WHERE CLAUSE
 $where_clauses = [];
 $params = [];
 $types = "";
 
+
 if (!empty($search_term)) {
-    $where_clauses[] = "(r.title LIKE ? OR r.description LIKE ? OR EXISTS (SELECT 1 FROM ingredients i WHERE i.recipe_id = r.recipe_id AND i.ingredient_text LIKE ?))";
+    // Tambah satu lagi syarat 'OR u.role LIKE ?' pada carian utama
+    $where_clauses[] = "(r.title LIKE ? OR r.description LIKE ? OR u.name LIKE ? OR u.role LIKE ? OR EXISTS (SELECT 1 FROM ingredients i WHERE i.recipe_id = r.recipe_id AND i.ingredient_text LIKE ?))";
+    
     $search_like = "%" . $search_term . "%";
-    $params[] = $search_like;
-    $params[] = $search_like;
-    $params[] = $search_like;
-    $types .= "sss";
+    
+    // Tambah parameter untuk setiap tanda soal (?)
+    $params[] = $search_like; // untuk r.title
+    $params[] = $search_like; // untuk r.description
+    $params[] = $search_like; // untuk u.name
+    $params[] = $search_like; // untuk u.role (BARU)
+    $params[] = $search_like; // untuk ingredients
+
+    // Jenis kini menjadi "sssss" kerana ada 5 parameter string
+    $types .= "sssss";
 }
+
+
 if (!empty($cuisine_filter)) {
     $where_clauses[] = "r.cuisine_id = ?";
     $params[] = $cuisine_filter; 
@@ -50,20 +61,20 @@ if (!empty($difficulty_filter)) {
     $where_clauses[] = "r.difficulty = ?";
     $params[] = $difficulty_filter; $types .= "s";
 }
-
 if (!empty($author_role_filter)) {
- 
     $where_clauses[] = "u.role = ?";
     $params[] = $author_role_filter; 
     $types .= "s";
 }
+
 $where_sql = !empty($where_clauses) ? " WHERE " . implode(" AND ", $where_clauses) : "";
 
-// --- 4. RUN TWO QUERIES FOR PAGINATION ---
-
+// (Baki kod PHP tidak perlu diubah)
 $count_sql = "SELECT COUNT(DISTINCT r.recipe_id) FROM recipes r JOIN user u ON r.user_id = u.user_id" . $where_sql;
 $stmt_count = $conn->prepare($count_sql);
-if (!empty($types)) { $stmt_count->bind_param($types, ...$params); }
+if (!empty($types)) { 
+    $stmt_count->bind_param($types, ...$params); 
+}
 $stmt_count->execute();
 $total_recipes = $stmt_count->get_result()->fetch_row()[0];
 $total_pages = ceil($total_recipes / $recipes_per_page);
@@ -93,7 +104,6 @@ if(!empty($types_for_recipes)) {
 $stmt_recipes->execute();
 $recipes = $stmt_recipes->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt_recipes->close();
-
 $conn->close();
 ?>
 <!DOCTYPE html>
@@ -155,9 +165,9 @@ $conn->close();
                 <a href="register.php" class="cta-button">Become a Contributor</a>
             </div>
             <br>
-            <form action="index.php" method="GET">
+            <form id="recipeSearchForm" action="index.php" method="GET">
                 <div class="search-bar" style="position: relative; display: flex; align-items: center;">
-                    <input type="text" name="search" id="searchInput" class="search-input" placeholder="Search or use voice..." value="<?php echo htmlspecialchars($search_term); ?>" style="padding-right: 120px;">
+                    <input type="text" name="search" id="searchInput" class="search-input" placeholder="Search for recipes, ingredients, or authors..." value="<?php echo htmlspecialchars($search_term); ?>" style="padding-right: 120px;">
                     <div class="voice-controls" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 10px;">
                         <select id="languageSelector" title="Select Voice Language" style="border: 1px solid #ccc; border-radius: 5px; padding: 5px; font-size: 0.9rem;">
                             <option value="en-US">English</option>
@@ -187,7 +197,7 @@ $conn->close();
                         <select name="diet" class="filter-select"><option value="">All Diets</option><option value="vegetarian" <?php if($diet_filter == 'vegetarian') echo 'selected'; ?>>🥬 Vegetarian</option><option value="vegan" <?php if($diet_filter == 'vegan') echo 'selected'; ?>>🌱 Vegan</option></select>
                         <select name="difficulty" class="filter-select"><option value="">All Levels</option><option value="easy" <?php if($difficulty_filter == 'easy') echo 'selected'; ?>>😊 Easy</option><option value="medium" <?php if($difficulty_filter == 'medium') echo 'selected'; ?>>🤔 Medium</option><option value="hard" <?php if($difficulty_filter == 'hard') echo 'selected'; ?>>😤 Hard</option></select>
                         
-                        <select name="author_role" class="filter-select">
+                        <select name="author_role" id="authorRoleFilter" class="filter-select">
                             <option value="">All Authors</option>
                             <option value="chef" <?php if($author_role_filter == 'chef') echo 'selected'; ?>>👨‍🍳 Chef</option>
                             <option value="student" <?php if($author_role_filter == 'student') echo 'selected'; ?>>🎓 Student</option>
@@ -237,7 +247,6 @@ $conn->close();
 
         <div class="pagination">
             <?php if ($total_pages > 1): ?>
-
                 <?php $query_string = http_build_query(['search' => $search_term, 'cuisine' => $cuisine_filter, 'diet' => $diet_filter, 'difficulty' => $difficulty_filter, 'author_role' => $author_role_filter]); ?>
                 <?php if ($current_page > 1): ?><a href="?page=<?php echo $current_page - 1; ?>&<?php echo $query_string; ?>">« Previous</a><?php else: ?><span class="disabled">« Previous</span><?php endif; ?>
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?><a href="?page=<?php echo $i; ?>&<?php echo $query_string; ?>" class="<?php if ($i == $current_page) echo 'current-page'; ?>"><?php echo $i; ?></a><?php endfor; ?>
@@ -246,17 +255,22 @@ $conn->close();
         </div>
     </div>
 
-    <script>
    
+    <script>
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
         const voiceSearchBtn = document.getElementById('voiceSearchBtn');
         const searchInput = document.getElementById('searchInput');
         const languageSelector = document.getElementById('languageSelector');
+        const authorRoleFilter = document.getElementById('authorRoleFilter');
+        const recipeSearchForm = document.getElementById('recipeSearchForm');
+
         if (recognition) {
             recognition.continuous = false;
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
+
             voiceSearchBtn.addEventListener('click', () => {
                 const selectedLanguage = languageSelector.value;
                 recognition.lang = selectedLanguage; 
@@ -269,17 +283,30 @@ $conn->close();
                     alert("Could not start voice recognition. It might be already active.");
                 }
             });
+
             recognition.onresult = function(event) {
-                const speechResult = event.results[0][0].transcript;
-                searchInput.value = speechResult;
+                const originalTranscript = event.results[0][0].transcript;
+                const cleanTranscript = originalTranscript.toLowerCase().trim();
+
+                searchInput.value = '';
+                authorRoleFilter.value = '';
+
+                if (cleanTranscript === 'chef' || cleanTranscript === 'chefs') {
+                    authorRoleFilter.value = 'chef';
+                } else if (cleanTranscript === 'student' || cleanTranscript === 'students') {
+                    authorRoleFilter.value = 'student';
+                } else {
+                    searchInput.value = originalTranscript;
+                }
+                
+                recipeSearchForm.submit();
             };
-            recognition.onspeechend = function() {
-                recognition.stop();
-            };
+
             recognition.onend = function() {
                 voiceSearchBtn.style.color = '#555';
-                searchInput.placeholder = "Search or use voice...";
-            }
+                searchInput.placeholder = "Search for recipes, ingredients, or authors...";
+            };
+
             recognition.onerror = function(event) {
                 console.error('Speech recognition error:', event.error);
                 let errorMessage = 'An error occurred in speech recognition: ' + event.error;
@@ -292,6 +319,7 @@ $conn->close();
                 }
                 alert(errorMessage);
             };
+
         } else {
             const voiceControls = document.querySelector('.voice-controls');
             if (voiceControls) {
