@@ -66,7 +66,7 @@ if($stmt_steps = $conn->prepare($sql_steps)) {
 
 // --- 6. FETCH REVIEWS AND THEIR MEDIA (CORRECTED + ADDED REVIEWER_ID) ---
 $reviews = [];
-// ===================== PERUBAHAN DI SINI: TAMBAH rev.user_id AS reviewer_id =====================
+
 $sql_reviews = "SELECT rev.review_id, rev.rating, rev.comment, rev.created_at, u.name AS reviewer_name, rev.user_id AS reviewer_id 
                 FROM reviews rev 
                 JOIN user u ON rev.user_id = u.user_id 
@@ -189,7 +189,7 @@ $conn->close();
     <div id="delete-success-notification" style="display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background-color: #dc3545; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; font-size: 1.1rem;">
         <i class="fas fa-trash-alt"></i> Your review has been deleted.
     </div>
-    <!-- ===================== AKHIR BAHAGIAN NOTIFIKASI ===================== -->
+   
 
 
     <nav class="navbar">
