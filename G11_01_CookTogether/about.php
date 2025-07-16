@@ -11,7 +11,6 @@ require_once 'connection.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="css/style.css" />
 
-<!-- In your <head> tag, replace the old <style> block with this one -->
 <style>
         /* Main container and footer styles */
         .about-us-container {
@@ -29,7 +28,6 @@ require_once 'connection.php';
             color: #e9ecef;
         }
 
-        /* === NEW: HERO IMAGE SECTION === */
         .about-hero-image-container {
             margin-bottom: 3rem; /* Space between image and vision section */
         }
@@ -37,10 +35,10 @@ require_once 'connection.php';
             width: 100%; /* Makes the image responsive */
             height: auto;
             display: block;
-            border-radius: 12px; /* Match the container's rounded corners */
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Nice subtle shadow */
-            object-fit: cover; /* Ensures image covers the area well */
-            max-height: 450px; /* Optional: sets a max height */
+            border-radius: 12px; 
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
+            object-fit: cover; 
+            max-height: 450px; 
         }
 
         /* Vision Section */
@@ -72,7 +70,7 @@ require_once 'connection.php';
             margin: 0 auto;
         }
 
-        /* === NEW: TEAM HEADER SECTION (FOR CENTERING) === */
+        
         .team-header-section {
             text-align: center;
             margin-bottom: 3rem; /* Adds space before the grid of members */
@@ -231,7 +229,7 @@ require_once 'connection.php';
                 </p>
             </div>
 
-            <!-- === NEW: WRAPPER DIV FOR CENTERING === -->
+        
             <div class="team-header-section">
                 <h2 class="team-section-title">Meet Our Team</h2>
                 <p class="team-section-subtitle">We are a group of passionate individuals from UTeM who brought CookTogether to life as part of our university project.</p>
