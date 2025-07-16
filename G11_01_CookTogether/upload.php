@@ -491,7 +491,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 updateRemoveButtons('#' + container.id, '.dynamic-input-group');
             }
 
-            // ---  Handles clicking the "Add Photo" button for a step ---
+            // --- Handles clicking the "Add Photo" button for a step ---
             if (e.target && e.target.classList.contains('add-step-photo-btn')) {
                 // Find the hidden file input within the same group and click it
                 e.target.closest('.step-image-controls').querySelector('.step-image-input').click();
@@ -513,7 +513,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         });
 
-        // --- EVENT LISTENER FOR STEP IMAGE FILE INPUTS ---
+        // ---  EVENT LISTENER FOR STEP IMAGE FILE INPUTS ---
         document.addEventListener('change', function(e) {
             if (e.target && e.target.classList.contains('step-image-input')) {
                 const file = e.target.files[0];
