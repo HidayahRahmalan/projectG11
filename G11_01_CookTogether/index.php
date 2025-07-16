@@ -22,6 +22,8 @@ $cuisine_filter = $_GET['cuisine'] ?? '';
 $diet_filter = $_GET['diet'] ?? '';
 $difficulty_filter = $_GET['difficulty'] ?? '';
 
+$author_role_filter = $_GET['author_role'] ?? '';
+
 // --- 3. DYNAMICALLY BUILD THE WHERE CLAUSE ---
 $where_clauses = [];
 $params = [];
@@ -48,10 +50,18 @@ if (!empty($difficulty_filter)) {
     $where_clauses[] = "r.difficulty = ?";
     $params[] = $difficulty_filter; $types .= "s";
 }
+
+if (!empty($author_role_filter)) {
+ 
+    $where_clauses[] = "u.role = ?";
+    $params[] = $author_role_filter; 
+    $types .= "s";
+}
 $where_sql = !empty($where_clauses) ? " WHERE " . implode(" AND ", $where_clauses) : "";
 
 // --- 4. RUN TWO QUERIES FOR PAGINATION ---
-$count_sql = "SELECT COUNT(DISTINCT r.recipe_id) FROM recipes r" . $where_sql;
+
+$count_sql = "SELECT COUNT(DISTINCT r.recipe_id) FROM recipes r JOIN user u ON r.user_id = u.user_id" . $where_sql;
 $stmt_count = $conn->prepare($count_sql);
 if (!empty($types)) { $stmt_count->bind_param($types, ...$params); }
 $stmt_count->execute();
@@ -60,25 +70,26 @@ $total_pages = ceil($total_recipes / $recipes_per_page);
 $stmt_count->close();
 
 $recipes_sql = "SELECT 
-                    r.recipe_id, r.title, r.description, c.cuisine_name, r.dietary_restrictions, -- Select cuisine_name
-                    r.difficulty, r.prep_time, r.cook_time, u.name AS author_name,
+                    r.recipe_id, r.title, r.description, c.cuisine_name, r.dietary_restrictions,
+                    r.difficulty, r.prep_time, r.cook_time, u.name AS author_name, u.role as author_role,
                     AVG(rev.rating) AS avg_rating, COUNT(DISTINCT rev.review_id) AS review_count,
                     (SELECT m.file_path FROM media m WHERE m.recipe_id = r.recipe_id AND m.media_type = 'image' ORDER BY m.media_id ASC LIMIT 1) AS main_image_path
                 FROM recipes r
                 JOIN user u ON r.user_id = u.user_id
-                LEFT JOIN cuisines c ON r.cuisine_id = c.cuisine_id -- Add LEFT JOIN
+                LEFT JOIN cuisines c ON r.cuisine_id = c.cuisine_id
                 LEFT JOIN reviews rev ON r.recipe_id = rev.recipe_id"
                 . $where_sql .
                 " GROUP BY r.recipe_id ORDER BY r.created_at DESC
                 LIMIT ? OFFSET ?";
-
 $params_for_recipes = $params;
 $params_for_recipes[] = $recipes_per_page;
 $params_for_recipes[] = $offset;
 $types_for_recipes = $types . "ii";
 
 $stmt_recipes = $conn->prepare($recipes_sql);
-$stmt_recipes->bind_param($types_for_recipes, ...$params_for_recipes);
+if(!empty($types_for_recipes)) {
+    $stmt_recipes->bind_param($types_for_recipes, ...$params_for_recipes);
+}
 $stmt_recipes->execute();
 $recipes = $stmt_recipes->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt_recipes->close();
@@ -100,62 +111,18 @@ $conn->close();
         .pagination a:hover { background: linear-gradient(45deg, #667eea, #764ba2); color: white; border-color: #667eea; transform: translateY(-2px); }
         .pagination .current-page { background: linear-gradient(45deg, #667eea, #764ba2); color: white; border-color: #667eea; }
         .pagination .disabled { background-color: #f0f2f5; color: #aaa; cursor: not-allowed; }
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-            background-color: #4a4255;
-            color: #e9ecef;
-        }
-        /* Add these new rules inside your existing <style> tag */
-        .new-contributor-cta {
-            background-color: rgba(255, 255, 255, 0.15); /* A subtle, glassy background */
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            margin-top: 2rem; /* Add space below the hero subtitle */
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            text-align: center;
-        }
-        .new-contributor-cta h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 1.6rem;
-            color: white;
-            font-weight: 600;
-        }
-        .new-contributor-cta p {
-            margin: 0 0 1.2rem 0;
-            color: white;
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-        .new-contributor-cta a.cta-button {
-            background-color: #fff;
-            color: #67597A; /* Your theme's purple color */
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
-            transition: all 0.2s ease-in-out;
-        }
-        .new-contributor-cta a.cta-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .nav-button {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white !important; /* Use !important to override .nav-link color if needed */
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: all 0.2s ease-in-out;
-            margin-left: 0.5rem; /* Adds space from the Login link */
-            font-weight: 500;
-        }
-        .nav-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
-        }
+        .footer { text-align: center; padding: 2rem; margin-top: 3rem; background-color: #4a4255; color: #e9ecef; }
+        .new-contributor-cta { background-color: rgba(255, 255, 255, 0.15); padding: 1.5rem 2rem; border-radius: 12px; margin-top: 2rem; border: 1px solid rgba(255, 255, 255, 0.3); text-align: center; }
+        .new-contributor-cta h3 { margin: 0 0 0.5rem 0; font-size: 1.6rem; color: white; font-weight: 600; }
+        .new-contributor-cta p { margin: 0 0 1.2rem 0; color: white; opacity: 0.9; font-size: 1.1rem; }
+        .new-contributor-cta a.cta-button { background-color: #fff; color: #67597A; padding: 0.8rem 2rem; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; transition: all 0.2s ease-in-out; }
+        .new-contributor-cta a.cta-button:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .nav-button { background: linear-gradient(45deg, #667eea, #764ba2); color: white !important; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; transition: all 0.2s ease-in-out; margin-left: 0.5rem; font-weight: 500; }
+        .nav-button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4); }
+        .user-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; color: #333; margin-right: -10px; }
+        .user-name { font-weight: 600; font-size: 0.9rem; }
+        .user-role { font-size: 0.75rem; color: #777; text-transform: capitalize; }
+        .recipe-author { font-size: 0.85rem; color: #666; margin: -5px 0 10px 0; font-style: italic; }
     </style>
 </head>
 <body>
@@ -172,9 +139,7 @@ $conn->close();
                     <a class="nav-link" href="logout.php">Logout</a>
                     <div class="user-avatar" title="<?php echo htmlspecialchars($_SESSION['name']); ?>"><?php echo strtoupper(substr($_SESSION["name"], 0, 1)); ?></div>
                 <?php else: ?>
-                    <!-- This is the modified block -->
                     <a class="nav-link" href="login.php">Login</a>
-                    
                 <?php endif; ?>
             </div>
         </div>
@@ -221,6 +186,13 @@ $conn->close();
                         </select>
                         <select name="diet" class="filter-select"><option value="">All Diets</option><option value="vegetarian" <?php if($diet_filter == 'vegetarian') echo 'selected'; ?>>🥬 Vegetarian</option><option value="vegan" <?php if($diet_filter == 'vegan') echo 'selected'; ?>>🌱 Vegan</option></select>
                         <select name="difficulty" class="filter-select"><option value="">All Levels</option><option value="easy" <?php if($difficulty_filter == 'easy') echo 'selected'; ?>>😊 Easy</option><option value="medium" <?php if($difficulty_filter == 'medium') echo 'selected'; ?>>🤔 Medium</option><option value="hard" <?php if($difficulty_filter == 'hard') echo 'selected'; ?>>😤 Hard</option></select>
+                        
+                        <select name="author_role" class="filter-select">
+                            <option value="">All Authors</option>
+                            <option value="chef" <?php if($author_role_filter == 'chef') echo 'selected'; ?>>👨‍🍳 Chef</option>
+                            <option value="student" <?php if($author_role_filter == 'student') echo 'selected'; ?>>🎓 Student</option>
+                        </select>
+                        
                         <button type="submit" class="view-recipe-btn" style="height: 100%;">Apply Filters</button>
                     </div>
                 </div>
@@ -237,6 +209,18 @@ $conn->close();
                         <div class="recipe-content">
                             <div class="recipe-rating"><?php $rating = round($recipe['avg_rating'] ?? 0); for ($i = 1; $i <= 5; $i++): echo $i <= $rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>'; endfor; ?><span>(<?php echo $recipe['review_count']; ?>)</span></div>
                             <h3 class="recipe-title"><a href="recipe-details.php?id=<?php echo $recipe['recipe_id']; ?>"><?php echo htmlspecialchars($recipe['title']); ?></a></h3>
+                            <p class="recipe-author">
+                                <?php
+                                    $byline = "By ";
+                                    if ($recipe['author_role'] === 'chef') {
+                                        $byline .= "Chef ";
+                                    } elseif ($recipe['author_role'] === 'student') {
+                                        $byline .= "Student ";
+                                    }
+                                    $byline .= htmlspecialchars($recipe['author_name']);
+                                    echo $byline;
+                                ?>
+                            </p>
                             <div class="recipe-meta">
                                 <?php if (!empty($recipe['cuisine_name'])): ?><span class="meta-tag"><?php echo ucfirst(htmlspecialchars($recipe['cuisine_name'])); ?></span><?php endif; ?>
                                 <?php if (!empty($recipe['dietary_restrictions'])): ?><span class="meta-tag"><?php echo ucfirst(htmlspecialchars($recipe['dietary_restrictions'])); ?></span><?php endif; ?>
@@ -244,7 +228,7 @@ $conn->close();
                                 <span class="meta-tag"><?php echo ucfirst(htmlspecialchars($recipe['difficulty'])); ?></span>
                             </div>
                             <p class="recipe-description"><?php echo htmlspecialchars(substr($recipe['description'], 0, 100)) . '...'; ?></p>
-                            <a href="recipe-details-viewer.php?id=<?php echo $recipe['recipe_id']; ?>" class="view-recipe-btn">View Recipe</a>
+                            <a href="recipe-details.php?id=<?php echo $recipe['recipe_id']; ?>" class="view-recipe-btn">View Recipe</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -253,7 +237,8 @@ $conn->close();
 
         <div class="pagination">
             <?php if ($total_pages > 1): ?>
-                <?php $query_string = http_build_query(['search' => $search_term, 'cuisine' => $cuisine_filter, 'diet' => $diet_filter, 'difficulty' => $difficulty_filter]); ?>
+
+                <?php $query_string = http_build_query(['search' => $search_term, 'cuisine' => $cuisine_filter, 'diet' => $diet_filter, 'difficulty' => $difficulty_filter, 'author_role' => $author_role_filter]); ?>
                 <?php if ($current_page > 1): ?><a href="?page=<?php echo $current_page - 1; ?>&<?php echo $query_string; ?>">« Previous</a><?php else: ?><span class="disabled">« Previous</span><?php endif; ?>
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?><a href="?page=<?php echo $i; ?>&<?php echo $query_string; ?>" class="<?php if ($i == $current_page) echo 'current-page'; ?>"><?php echo $i; ?></a><?php endfor; ?>
                 <?php if ($current_page < $total_pages): ?><a href="?page=<?php echo $current_page + 1; ?>&<?php echo $query_string; ?>">Next »</a><?php else: ?><span class="disabled">Next »</span><?php endif; ?>
@@ -261,49 +246,40 @@ $conn->close();
         </div>
     </div>
 
-    <!-- SCRIPT FOR BILINGUAL VOICE SEARCH AI -->
     <script>
+   
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = SpeechRecognition ? new SpeechRecognition() : null;
-
         const voiceSearchBtn = document.getElementById('voiceSearchBtn');
         const searchInput = document.getElementById('searchInput');
         const languageSelector = document.getElementById('languageSelector');
-
         if (recognition) {
             recognition.continuous = false;
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
-
             voiceSearchBtn.addEventListener('click', () => {
-                // Set the language from the dropdown before starting
                 const selectedLanguage = languageSelector.value;
                 recognition.lang = selectedLanguage; 
-                
                 try {
                     recognition.start();
-                    voiceSearchBtn.style.color = '#dc3545'; // Red to indicate listening
+                    voiceSearchBtn.style.color = '#dc3545';
                     searchInput.placeholder = 'Listening...';
                 } catch (e) {
                     console.error("Error starting recognition:", e);
                     alert("Could not start voice recognition. It might be already active.");
                 }
             });
-
             recognition.onresult = function(event) {
                 const speechResult = event.results[0][0].transcript;
                 searchInput.value = speechResult;
             };
-
             recognition.onspeechend = function() {
                 recognition.stop();
             };
-
-            recognition.onend = function() { // This event fires when recognition stops for any reason
-                voiceSearchBtn.style.color = '#555'; // Revert color
+            recognition.onend = function() {
+                voiceSearchBtn.style.color = '#555';
                 searchInput.placeholder = "Search or use voice...";
             }
-
             recognition.onerror = function(event) {
                 console.error('Speech recognition error:', event.error);
                 let errorMessage = 'An error occurred in speech recognition: ' + event.error;
@@ -316,7 +292,6 @@ $conn->close();
                 }
                 alert(errorMessage);
             };
-
         } else {
             const voiceControls = document.querySelector('.voice-controls');
             if (voiceControls) {
@@ -325,7 +300,6 @@ $conn->close();
             console.error("Speech Recognition API not available in this browser.");
         }
     </script>
-
     <footer class="footer">
         <p>© <?php echo date("Y"); ?> CookTogether. All Rights Reserved.</p>
     </footer>
