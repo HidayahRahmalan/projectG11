@@ -59,9 +59,6 @@ try {
 
     $review_owner_id = $review_data[0]['user_id'];
     
-    // =================================================================
-    //  THE MOST IMPORTANT SECURITY CHECK: VERIFY OWNERSHIP
-    // =================================================================
     // Check if the logged-in user is the actual owner of the review
     if ($review_owner_id !== $current_user_id) {
         // If not the owner, stop everything.
