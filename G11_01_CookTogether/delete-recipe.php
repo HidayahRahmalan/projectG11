@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['recipe_id'])) {
             // Success! Commit the transaction.
             $conn->commit();
             // Redirect to homepage with a success message
-            header("location: index.php?delete_success=1");
+            header("location: home.php?delete_success=1");
             exit();
         } else {
             // If no rows were affected, it means the user did not have permission.
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['recipe_id'])) {
 
 } else {
     // If not a POST request, just redirect away.
-    header("location: index.php");
+    header("location: home.php");
     exit();
 }
 ?>
