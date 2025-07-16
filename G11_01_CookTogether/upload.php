@@ -463,7 +463,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             updateRemoveButtons('#ingredientsContainer', '.dynamic-input-group');
         });
 
-        // --- STEP DYNAMIC ACTIONS  ---
+        // --- STEP DYNAMIC ACTIONS ---
         const stepsContainer = document.getElementById('stepsContainer');
         document.getElementById('addStepBtn').addEventListener('click', function() {
             const newStep = document.createElement('div');
@@ -497,7 +497,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 e.target.closest('.step-image-controls').querySelector('.step-image-input').click();
             }
 
-            // --- Handles removing a step's photo preview ---
+            // ---  Handles removing a step's photo preview ---
             if (e.target && e.target.classList.contains('remove-step-photo-btn')) {
                 const controls = e.target.closest('.step-image-controls');
                 const preview = controls.querySelector('.step-image-preview');
@@ -513,7 +513,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         });
 
-        // ---  EVENT LISTENER FOR STEP IMAGE FILE INPUTS ---
+        // --- EVENT LISTENER FOR STEP IMAGE FILE INPUTS ---
         document.addEventListener('change', function(e) {
             if (e.target && e.target.classList.contains('step-image-input')) {
                 const file = e.target.files[0];
