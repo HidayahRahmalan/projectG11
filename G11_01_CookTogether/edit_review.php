@@ -31,7 +31,7 @@ if (!$review) {
     die("Review not found.");
 }
 
-// Pemeriksaan keselamatan PALING PENTING
+// Pemeriksaan keselamatan 
 if ($review['user_id'] !== $current_user_id) {
     die("Access Denied. You do not have permission to edit this review.");
 }
