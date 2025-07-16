@@ -1,6 +1,6 @@
 <?php
 // Database configuration
-$db_host = "bitp3353.utem.edu.my";
+$db_host = "localhost";
 $db_user = "mrs";
 $db_password = "12345";
 $db_name = "p25_maintenance_db";
