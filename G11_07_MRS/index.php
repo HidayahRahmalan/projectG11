@@ -104,6 +104,81 @@
             font-size: 0.95rem;
             color: #555;
         }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .team-member {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(44, 62, 80, 0.08);
+            padding: 20px 10px 30px 10px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s;
+        }
+        .team-member:hover {
+            box-shadow: 0 16px 32px rgba(44, 62, 80, 0.13);
+        }
+        .member-avatar-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+        .member-avatar {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.15);
+            background: #eee;
+        }
+        .resume-preview {
+            width: 220px;
+            height: 220px;
+            margin: 20px auto 10px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(44, 62, 80, 0.10);
+            background: #fafbfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .resume-preview iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fafbfc;
+        }
+        .member-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            margin-top: 5px;
+        }
+        .member-role {
+            font-size: 1.1rem;
+            color: var(--main-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .member-info {
+            color: #333;
+        }
+        .btn.btn-primary.mt-2 {
+            margin-top: 0.75rem;
+        }
         footer {
             text-align: center;
             padding: 1rem;
@@ -123,14 +198,81 @@
         <p style="margin-top: 1rem; font-weight: 600; color: white;">Student BITD Gempak</p>
     </section>
 
-    <main class="grid">
- 
- 
- 
-    </main>
+    <section class="team-section">
+        <div class="container">
+            <h2 class="section-title">Meet Our Team</h2>
+            <div class="team-grid">
+                <!-- Norleen Thohirah Binti Rafeli -->
+                <div class="team-member">
+                    <div class="member-avatar-wrapper">
+                        <img src="team_members/picture/norleen.jpg" alt="Norleen" class="member-avatar">
+                    </div>
+                    <div class="member-info text-center">
+                        <h3 class="member-name">Norleen Thohirah Binti Rafeli</h3>
+                        <div class="resume-preview">
+                            <iframe src="team_members/resume/NORLEEN RESUME.pdf" frameborder="0"></iframe>
+                        </div>
+                        <a href="team_members/resume/NORLEEN RESUME.pdf" class="btn btn-primary mt-2" target="_blank">View Full Resume (PDF)</a>
+                    </div>
+                </div>
+                <!-- Nur Azalina Izani Binti Nasron -->
+                <div class="team-member">
+                    <div class="member-avatar-wrapper">
+                        <img src="team_members/picture/azalina.jpg" alt="Azalina" class="member-avatar">
+                    </div>
+                    <div class="member-info text-center">
+                        <h3 class="member-name">Nur Azalina Izani Binti Nasron</h3>
+                        <div class="resume-preview">
+                            <iframe src="team_members/resume/Azalina Resume.pdf" frameborder="0"></iframe>
+                        </div>
+                        <a href="team_members/resume/Azalina Resume.pdf" class="btn btn-primary mt-2" target="_blank">View Full Resume (PDF)</a>
+                    </div>
+                </div>
+                <!-- Nuradlina Faqihah binti Mohd Adib -->
+                <div class="team-member">
+                    <div class="member-avatar-wrapper">
+                        <img src="team_members/picture/adlina.jpg" alt="Nuradlina Faqihah binti Mohd Adib" class="member-avatar">
+                    </div>
+                    <div class="member-info text-center">
+                        <h3 class="member-name">Nuradlina Faqihah binti Mohd Adib</h3>
+                        <div class="resume-preview">
+                            <iframe src="team_members/resume/Resume Nuradlina Faqihah binti Mohd Adib.pdf" frameborder="0"></iframe>
+                        </div>
+                        <a href="team_members/resume/Resume Nuradlina Faqihah binti Mohd Adib.pdf" class="btn btn-primary mt-2" target="_blank">View Full Resume (PDF)</a>
+                    </div>
+                </div>
+                <!-- Barizah Mahamad Rusli -->
+                <div class="team-member">
+                    <div class="member-avatar-wrapper">
+                        <img src="team_members/picture/Barizah.jpg" alt="Barizah" class="member-avatar">
+                    </div>
+                    <div class="member-info text-center">
+                        <h3 class="member-name">Barizah Mahamad Rusli</h3>
+                        <div class="resume-preview">
+                            <iframe src="team_members/resume/Barizah Resume.pdf" frameborder="0"></iframe>
+                        </div>
+                        <a href="team_members/resume/Barizah Resume.pdf" class="btn btn-primary mt-2" target="_blank">View Full Resume (PDF)</a>
+                    </div>
+                </div>
+                <!-- Maisara A/P Siput -->
+                <div class="team-member">
+                    <div class="member-avatar-wrapper">
+                        <img src="team_members/picture/Maisara.png" alt="Maisara" class="member-avatar">
+                    </div>
+                    <div class="member-info text-center">
+                        <h3 class="member-name">Maisara A/P Siput</h3>
+                        <div class="resume-preview">
+                            <iframe src="team_members/resume/Maisara Siput.pdf" frameborder="0"></iframe>
+                        </div>
+                        <a href="team_members/resume/Maisara Siput.pdf" class="btn btn-primary mt-2" target="_blank">View Full Resume (PDF)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer>
         &copy; <?= date('Y') ?> Project Team. All rights reserved.
     </footer>
 </body>
-</html>
+</html> 
