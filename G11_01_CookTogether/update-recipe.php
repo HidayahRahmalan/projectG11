@@ -202,7 +202,7 @@ try {
     if (!empty($posted_ingredients)) {
         $stmt_ing = $conn->prepare("INSERT INTO ingredients (recipe_id, ingredient_text, sort_order) VALUES (?, ?, ?)");
         foreach ($posted_ingredients as $index => $text) {
-            // --- FIX: Store the calculation in a variable first ---
+            // --- Store the calculation in a variable first ---
             $sort_order = $index + 1; 
             
             // --- Now pass the variable to bind_param ---
