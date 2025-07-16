@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meet the Team - E-Learning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f9f9fc; margin: 0; padding: 20px 40px; color: #1e1e1e; }
+    header { position: relative; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+    .logo { position: absolute; left: 40px; font-size: 24px; font-weight: 700; color: #ea4c89; }
+    nav ul { display: flex; gap: 30px; list-style: none; font-size: 16px; padding-left: 0; margin: 0; }
+    nav a { color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px; transition: background-color 0.3s ease, color 0.3s ease; }
+    nav a:hover, nav a.active { background-color: #ea4c89; color: white; cursor: pointer; }
+
+    h1 {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 32px;
+      color: #ea4c89;
+    }
+
+    .team-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .team-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .team-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .team-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+
+    .team-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .resume-button {
+      background-color: #ea4c89;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+      display: inline-block;
+    }
+
+    .resume-button:hover {
+      background-color: #d33874;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 20px; }
+      .team-container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">E-Learning</div>
+  <nav>
+    <ul>
+      <li><a href="dashboard.html">Home</a></li>
+      <li><a href="modules.html">Courses</a></li>
+      <li><a href="meet_us.html" class="active">About Us</a></li>
+      <li><a href="../Homepage/Home.html" class = "protected-link" onclick="confirmLogout(event)">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<h1>Meet Our Team</h1>
+
+<section class="team-container">
+  <div class="team-card">
+    <img src="../img/errish.jpg" alt="Team Member 1" />
+    <div class="team-name">Errish Qayyum</div>
+    <a class="resume-button" href="../resume/MuhammadErrishQayyum_CV 2025.pdf" target="_blank">View Resume</a>
+  </div>
+
+  <div class="team-card">
+    <img src="../img/aisar.jpg" alt="Team Member 2" />
+    <div class="team-name">Aisar Nublan</div>
+    <a class="resume-button" href="../resume/Resume Aisar.pdf" target="_blank">View Resume</a>
+  </div>
+
+  <div class="team-card">
+    <img src="../img/farid.jpg" alt="Team Member 3" />
+    <div class="team-name">Farid Aiman</div>
+    <a class="resume-button" href="../resume/Resume 2.pdf" target="_blank">View Resume</a>
+  </div>
+
+  <div class="team-card">
+    <img src="../img/lutfil.jpg" alt="Team Member 3" />
+    <div class="team-name">Lutfil Hadi</div>
+    <a class="resume-button" href="../resume/LutfilHadi Resume.pdf" target="_blank">View Resume</a>
+  </div>
+
+  <!-- Add more members as needed -->
+</section>
+
+<script>
+    function confirmLogout(event) {
+  event.preventDefault(); // Prevent immediate navigation
+  if (confirm("Are you sure you want to logout?")) {
+    window.location.href = "../Homepage/Home.html"; // Change this to your actual logout destination
+  }
+}
+</script>
+</body>
+</html>

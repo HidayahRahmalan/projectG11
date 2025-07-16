@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Homepage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9fc;
+      color: #1e1e1e;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #eee;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ea4c89;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+      font-size: 16px;
+    }
+
+    nav a {
+      color: #333;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: #ea4c89;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    nav a.active {
+      background-color: #ea4c89;
+      color: #fff;
+      cursor: default;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .auth-buttons a {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .sign-in {
+      color: #333;
+    }
+
+    .sign-up {
+      background-color: #ea4c89;
+      color: #fff;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 80px 60px;
+      flex-wrap: wrap;
+    }
+
+    .hero-text {
+      max-width: 500px;
+    }
+
+    .hero-text h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .hero-text p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .hero-text .cta-btn {
+      background-color: #ea4c89;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    .hero-image img {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .dashboard-preview {
+      padding: 60px;
+      background-color: #fff;
+      text-align: center;
+    }
+
+    .dashboard-preview h2 {
+      font-size: 32px;
+      margin-bottom: 40px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+    }
+
+    .feature-card {
+      background: #f1f1f9;
+      padding: 30px 20px;
+      border-radius: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .feature-card h4 {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      width: 80%;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 15px;
+    }
+
+    .modal-content a {
+      margin-top: 20px;
+      display: inline-block;
+      background: #ea4c89;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .modal-close {
+      margin-top: 10px;
+      cursor: pointer;
+      color: #999;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .hero-text {
+        margin-bottom: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">E-Learning</div>
+    <nav>
+      <ul>
+        <li><a href="dashboard.html" class="protected-link active">Home</a></li>
+        <li><a href="modules.html" class="protected-link">Courses</a></li>
+        <li><a href="meet_us.html" class="protected-link">About Us</a></li>
+        <li><a href="../Homepage/Home.html" class = "protected-link" onclick="confirmLogout(event)">Logout</a></li>
+      </ul>
+    </nav>
+   
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1>Welcome to Your Learning Platform</h1>
+      <p>Empower your knowledge anytime, anywhere. Explore interactive courses, live sessions, and more.</p>
+      <a href="modules.html" class="cta-btn protected-link">Explore Courses</a>
+    </div>
+    <div class="hero-image">
+      <img src="../img/stack-of-books.png" alt="E-Learning Illustration" />
+    </div>
+  </section>
+
+  <script>
+    function confirmLogout(event) {
+  event.preventDefault(); // Prevent immediate navigation
+  if (confirm("Are you sure you want to logout?")) {
+    window.location.href = "../Homepage/Home.html"; // Change this to your actual logout destination
+  }
+}
+  </script>
+  
+</body>
+</html>

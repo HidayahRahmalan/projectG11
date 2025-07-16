@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register Page</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background: url('../img/background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .glass-card {
+      width: 90%;
+      max-width: 1000px;
+      height: 85vh;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      display: flex;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(111, 0, 255, 0.6), rgba(255, 110, 196, 0.6));
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .left-panel h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .left-panel p {
+      font-size: 1.1rem;
+      max-width: 400px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .register-box {
+      width: 100%;
+      max-width: 350px;
+      color: #333;
+    }
+
+    .register-box h2 {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .register-box input,
+    .register-box select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      border-radius: 25px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: #000;
+    }
+
+    .register-box input::placeholder,
+    .register-box select {
+      color: rgba(0, 0, 0, 0.7);
+    }
+    
+    .register-box option[disabled] {
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    .register-box button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #6f00ff, #ff6ec4);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .register-box button:hover {
+      opacity: 0.9;
+    }
+    
+    .login-btn {
+      padding: 12px 30px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 114, 255, 0.4);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 114, 255, 0.6);
+      opacity: 0.95;
+    }
+
+    @media (max-width: 768px) {
+      .glass-card {
+        flex-direction: column;
+        height: auto;
+        max-height: 95vh;
+        overflow-y: auto;
+      }
+
+      .left-panel, .right-panel {
+        width: 100%;
+        padding: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glass-card">
+    <div class="left-panel">
+      <h1>Create Account</h1>
+      <p>Join us and take control of your learning journey. Designed specifically for students and lifelong learners seeking flexible, skill-focused education.</p>
+      <p>Already have an account?</p>
+     <a href="login.html"><button type="button" class="login-btn">Login</button></a> 
+    </div>
+    <div class="right-panel">
+      <div class="register-box">
+        <h2>Register</h2>
+        <form action="../backend/register.php" method="POST">
+            <input type="text" name="username" placeholder="Username" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <input type="password" name="confirm_password" placeholder="Confirm Password" required />
+            <input type="text" name="fullname" placeholder="Full Name" required />
+            <input type="email" name="email" placeholder="Email" required />
+            
+            <!-- IMPORTANT: Role is now hidden and defaults to 'student' -->
+            <input type="hidden" name="userrole" value="Student">
+
+            <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

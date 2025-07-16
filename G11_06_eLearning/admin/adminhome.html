@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9fc;
+      margin: 0;
+      padding: 0 40px 40px;
+      color: #1e1e1e;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ea4c89;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background-color: #ea4c89;
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 40px 0 30px;
+      color: #ea4c89;
+    }
+
+    table {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f1f9;
+      font-weight: 600;
+      color: #333;
+    }
+
+    td {
+      border-top: 1px solid #eee;
+    }
+
+    .rating {
+      color: #f4c150;
+      font-weight: bold;
+    }
+
+    .actions a {
+      font-size: 14px;
+      color: #ea4c89;
+      text-decoration: none;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .actions a:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal styles */
+    #moduleModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #moduleModal .modal-box {
+      background: white;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    #closeModal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+
+    #closeModal:hover {
+      color: #ea4c89;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 20px;
+      }
+
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      td {
+        position: relative;
+        padding-left: 50%;
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        top: 16px;
+        font-weight: bold;
+        color: #999;
+      }
+
+      tr {
+        margin-bottom: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">E-Learning Admin</div>
+  <nav>
+    <ul>
+      <li><a href="#" class="active">Dashboard</a></li>
+      <li><a href="user.html">Users</a></li>
+      <li><a href="../Homepage/Home.html" onclick="confirmLogout(event)">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<h1>Module Usage & Ratings</h1>
+
+<div style="display: flex; justify-content: center; margin-bottom: 20px;">
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="Search by module title, instructor or topic..."
+    style="padding: 10px 16px; width: 100%; max-width: 400px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px;"
+  />
+</div>
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Module Title</th>
+      <th>Instructor</th>
+      <th>Topic</th>
+      <th>Views</th>
+      <th>Avg. Rating</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="moduleTable">
+    <tr><td colspan="6">Loading data...</td></tr>
+  </tbody>
+</table>
+
+<!-- Modal -->
+<div id="moduleModal">
+  <div class="modal-box">
+    <span id="closeModal">&times;</span>
+    <div id="modalContent">Loading...</div>
+  </div>
+</div>
+
+<script>
+  // Fetch and load module data into the table
+  fetch('../backend/adminhome.php')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('moduleTable').innerHTML = html;
+
+      // Attach event listener to "View" buttons after loading
+      document.querySelectorAll('.view-btn').forEach(button => {
+        button.addEventListener('click', function (e) {
+          e.preventDefault();
+          const id = this.getAttribute('data-id');
+          const modal = document.getElementById('moduleModal');
+          const content = document.getElementById('modalContent');
+          modal.style.display = 'flex';
+          content.innerHTML = 'Loading...';
+
+          fetch(`../backend/get_module.php?id=${id}`)
+            .then(res => res.text())
+            .then(html => {
+              content.innerHTML = html;
+            })
+            .catch(() => {
+              content.innerHTML = '<p>Error loading module details.</p>';
+            });
+        });
+      });
+    })
+    .catch(error => {
+      document.getElementById('moduleTable').innerHTML = '<tr><td colspan="6">Error loading data.</td></tr>';
+      console.error('Fetch error:', error);
+    });
+
+  // Close modal
+  document.getElementById('closeModal').addEventListener('click', () => {
+    document.getElementById('moduleModal').style.display = 'none';
+  });
+
+  // Close when clicking outside modal
+  window.addEventListener('click', (e) => {
+    const modal = document.getElementById('moduleModal');
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  document.getElementById('searchInput').addEventListener('input', function () {
+  const keyword = this.value.toLowerCase();
+  const rows = document.querySelectorAll('#moduleTable tr');
+
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(keyword) ? '' : 'none';
+  });
+});
+
+function confirmLogout(event) {
+  event.preventDefault(); // Prevent immediate navigation
+  if (confirm("Are you sure you want to logout?")) {
+    window.location.href = "../Homepage/Home.html"; // Change this to your actual logout destination
+  }
+}
+
+</script>
+
+</body>
+</html>

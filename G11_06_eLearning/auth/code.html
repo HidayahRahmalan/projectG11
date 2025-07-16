@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Code</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background: url('../img/background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .glass-card {
+      width: 90%;
+      max-width: 1000px;
+      height: 70vh;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      display: flex;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(111, 0, 255, 0.6), rgba(255, 110, 196, 0.6));
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .left-panel h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .left-panel p {
+      font-size: 1.1rem;
+      max-width: 400px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .verify-box {
+      width: 100%;
+      max-width: 350px;
+      color: #0c0c0c;
+    }
+
+    .verify-box h2 {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .verify-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      border-radius: 25px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: rgb(0, 0, 0);
+    }
+
+    .verify-box input::placeholder {
+      color: rgba(0, 0, 0, 0.7);
+    }
+
+    .verify-box button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #6f00ff, #ff6ec4);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .verify-box button:hover {
+      opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+      .glass-card {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .left-panel, .right-panel {
+        width: 100%;
+        padding: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glass-card">
+    <div class="left-panel">
+      <h1>Code Verification</h1>
+      <p>Enter the 6-digit code sent to your email to verify your identity.</p>
+    </div>
+    <div class="right-panel">
+      <div class="verify-box">
+        <h2>Enter Verification Code</h2>
+        <form action="../backend/code.php" method="POST">
+          <input type="text" name="code" placeholder="Enter verification code" required />
+          <button type="submit">Verify</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

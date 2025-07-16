@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Module Topics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f9f9fc; margin: 0; padding: 20px 40px; color: #1e1e1e; }
+    header { position: relative; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+    .logo { position: absolute; left: 40px; font-size: 24px; font-weight: 700; color: #ea4c89; }
+    nav ul { display: flex; gap: 30px; list-style: none; font-size: 16px; padding-left: 0; margin: 0; }
+    nav a { color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px; transition: background-color 0.3s ease, color 0.3s ease; }
+    nav a:hover, nav a.active { background-color: #ea4c89; color: white; cursor: pointer; }
+
+    .status-message { text-align: center; color: #555; margin-top: 40px; }
+    .topic-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 30px; margin-top: 30px; }
+    .topic-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .topic-box h3 { margin: 0 0 15px 0; font-size: 20px; color: #ea4c89; }
+    .resources a { display: inline-block; margin-right: 10px; margin-bottom: 8px; background: #e0e0ef; padding: 8px 12px; border-radius: 6px; text-decoration: none; color: #333; font-size: 14px; }
+    .resources a:hover { background: #ea4c89; color: white; }
+
+    @media (max-width: 600px) {
+      body { padding: 20px; }
+      .topic-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">E-Learning</div>
+  <nav>
+    <ul>
+      <li><a href="Home.html">Home</a></li>
+      <li><a href="modules.html">Courses</a></li>
+    </ul>
+  </nav>
+</header>
+
+<h2>Topics in This Module</h2>
+<div id="topicsList" class="topic-list"><p class="status-message">Loading...</p></div>
+
+<script>
+  // --- START: ADDITION ---
+  // Define the path to your default video. 
+  // This is a relative URL that the browser can understand.
+  const DEFAULT_VIDEO_PATH = '../uploads/videos/vid_686a97c31fcca8.74721878.mp4';
+  // --- END: ADDITION ---
+  
+  function getModuleIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('module_id');
+  }
+
+  async function fetchTopics(moduleId) {
+    try {
+      const response = await fetch(`../backend/get_module_topics.php?module_id=${moduleId}`);
+      const data = await response.json();
+
+      if (data.error) {
+        document.getElementById('topicsList').innerHTML = `<p class="status-message" style="color:red;">${data.error}</p>`;
+      } else if (data.length === 0) {
+        document.getElementById('topicsList').innerHTML = `<p class="status-message">No topics found for this module.</p>`;
+      } else {
+        renderTopics(data);
+      }
+    } catch (err) {
+      document.getElementById('topicsList').innerHTML = `<p class="status-message" style="color:red;">Error fetching topics</p>`;
+      console.error(err);
+    }
+  }
+
+  function renderTopics(topics) {
+    const html = topics.map(topic => {
+      // --- START: MODIFICATION ---
+      // First, generate links for all available resources as before
+      const videoLinks = topic.videos.map(v => `<a href="../${v.FilePath}" target="_blank">🎥 Video</a>`).join(' ');
+      const slideLinks = topic.slides.map(s => `<a href="../${s.FilePath}" target="_blank">📊 Slide</a>`).join(' ');
+      const noteLinks = topic.notes.map(n => `<a href="../${n.FilePath}" target="_blank">📝 Note</a>`).join(' ');
+
+      // Combine all the resource links into one string
+      const allResourceLinks = (videoLinks + slideLinks + noteLinks).trim();
+
+      // Now, decide what content to display.
+      // If there are actual resources, show them. Otherwise, show the default video link.
+      const resourcesContent = allResourceLinks 
+        ? allResourceLinks 
+        : `<a href="${DEFAULT_VIDEO_PATH}" target="_blank">🎥 Default Video</a>`;
+
+      // Use the 'resourcesContent' in the final HTML
+      return `
+        <div class="topic-box">
+          <h3>${topic.TopicName}</h3>
+          <div class="resources">
+            ${resourcesContent}
+          </div>
+        </div>
+      `;
+      // --- END: MODIFICATION ---
+    }).join('');
+
+    document.getElementById('topicsList').innerHTML = html;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const moduleId = getModuleIdFromURL();
+    if (!moduleId) {
+      document.getElementById('topicsList').innerHTML = '<p class="status-message" style="color:red;">Module ID is missing in the URL</p>';
+      return;
+    }
+    fetchTopics(moduleId);
+  });
+</script>
+
+</body>
+</html>

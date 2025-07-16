@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modules - Your Courses</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f9f9fc; margin: 0; padding: 20px 40px; color: #1e1e1e; }
+    header { position: relative; display: flex; align-items: center; justify-content: center; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+    .logo { position: absolute; left: 40px; font-size: 24px; font-weight: 700; color: #ea4c89; }
+    nav ul { display: flex; gap: 30px; list-style: none; font-size: 16px; padding-left: 0; margin: 0; }
+    nav a { color: #333; text-decoration: none; padding: 6px 10px; border-radius: 6px; transition: background-color 0.3s ease, color 0.3s ease; }
+    nav a:hover, nav a.active { background-color: #ea4c89; color: white; cursor: pointer; }
+    .search-bar { margin: 20px 0 40px 0; max-width: 400px; }
+    .search-bar input { width: 100%; padding: 10px 15px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; outline: none; transition: border-color 0.3s ease; }
+    .search-bar input:focus { border-color: #ea4c89; }
+    .course-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 30px; align-items: start; }
+    .course-card { position: relative; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: box-shadow 0.3s ease; cursor: pointer; overflow: hidden; }
+    .course-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .course-title { font-weight: 700; font-size: 20px; margin-bottom: 10px; color: #ea4c89; }
+    .course-topic { font-size: 14px; color: #777; margin-bottom: 15px; }
+    .status-message { text-align: center; color: #555; width: 100%; }
+
+    @media (max-width: 600px) {
+      body { padding: 20px; }
+      .course-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">E-Learning</div>
+  <nav>
+    <ul>
+      <li><a href="dashboard.html">Home</a></li>
+      <li><a href="modules.html" class="active">Courses</a></li>
+      <li><a href="meet_us.html" class="protected-link">About Us</a></li>
+      <li><a href="../Homepage/Home.html" class = "protected-link" onclick="confirmLogout(event)">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search courses by keyword..." />
+</section>
+
+<section class="course-list" id="courseList">
+  <p class="status-message">Loading courses...</p>
+</section>
+
+<!-- Rating Modal -->
+<div id="ratingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; width:90%; max-width:400px; position:relative;">
+    <span onclick="closeModal()" style="position:absolute; top:10px; right:15px; cursor:pointer;">&times;</span>
+    <h3>Rate this Module</h3>
+    <form id="ratingForm">
+      <input type="hidden" id="modalModuleId" name="module_id">
+      <label for="rating">Rating (1–5):</label>
+      <input type="number" name="rating" id="rating" min="1" max="5" required style="width:100%; padding:8px; margin:10px 0;">
+      <label for="comment">Comment:</label>
+      <textarea name="comment" id="comment" rows="4" style="width:100%; padding:8px;" placeholder="Optional..."></textarea>
+      <button type="submit" style="margin-top:15px; background:#ea4c89; color:white; padding:10px 15px; border:none; border-radius:6px; cursor:pointer;">Submit Rating</button>
+    </form>
+    <div id="ratingResponse" style="margin-top:10px; font-size:14px;"></div>
+  </div>
+</div>
+
+<script>
+let allCourses = [];
+const courseListEl = document.getElementById('courseList');
+const searchInput = document.getElementById('searchInput');
+
+async function fetchCourses() {
+  try {
+    const response = await fetch('../backend/student_modulesview.php');
+    if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+    
+    const data = await response.json();
+    allCourses = Array.isArray(data) ? data : [];
+
+    if (allCourses.length === 0) {
+      courseListEl.innerHTML = '<p class="status-message">There are no published courses available at the moment.</p>';
+      return;
+    }
+
+    renderCourses();
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    courseListEl.innerHTML = `<p class="status-message" style="color:red;">Failed to load courses. Please check the backend path and script.</p>`;
+  }
+}
+
+function renderCourses() {
+  const keyword = searchInput.value.toLowerCase().trim();
+
+  let filteredCourses = allCourses.filter(course => 
+      course.Title.toLowerCase().includes(keyword)
+  );
+
+  if (filteredCourses.length === 0) {
+    courseListEl.innerHTML = '<p class="status-message">No courses found matching your criteria.</p>';
+    return;
+  }
+
+  courseListEl.innerHTML = filteredCourses.map(course => {
+    const topicCount = course.Topics ? course.Topics.length : 0;
+    const topicDisplay = topicCount === 1 
+      ? `Topic: ${course.Topics[0].TopicName}` 
+      : `${topicCount} topics available`;
+
+    return `
+      <div class="course-card" onclick="goToTopicPage(${course.ModuleID})">
+        <div>
+         <div class="course-title">
+  <a href="topic.html?module_id=${course.ModuleID}" style="color:#ea4c89; text-decoration:none;">${course.Title}</a>
+</div>
+
+          <div class="course-topic">${topicDisplay}</div>
+        </div>
+        <div style="margin-top:15px;">
+          <button onclick="event.stopPropagation(); openModal(${course.ModuleID}, event)" style="padding:8px 14px; background:#ea4c89; color:white; border:none; border-radius:6px; cursor:pointer;">Rate Module</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function goToTopicPage(moduleId) {
+  // First, send request to increment view count
+  fetch('../backend/increment_view.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `module_id=${encodeURIComponent(moduleId)}`
+  })
+  .catch(err => console.warn("View update failed:", err));
+
+  // Then redirect to topic page
+  window.location.href = `topic.html?module_id=${moduleId}`;
+}
+
+
+function openModal(moduleId, event) {
+  event.stopPropagation();
+  document.getElementById('modalModuleId').value = moduleId;
+  document.getElementById('ratingModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('ratingModal').style.display = 'none';
+  document.getElementById('ratingForm').reset();
+  document.getElementById('ratingResponse').textContent = '';
+}
+
+document.getElementById('ratingForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  try {
+    const response = await fetch('../backend/submit_rating.php', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.text();
+    document.getElementById('ratingResponse').textContent = result;
+
+    if (result.toLowerCase().includes("success")) {
+      alert("✅ Rating submitted successfully!");
+      setTimeout(closeModal, 1500);
+    } else {
+      alert("⚠️ Failed to submit rating: " + result);
+    }
+  } catch (err) {
+    document.getElementById('ratingResponse').textContent = 'Error submitting rating.';
+    alert("❌ Error submitting rating. Please try again later.");
+  }
+});
+
+document.addEventListener('DOMContentLoaded', fetchCourses);
+searchInput.addEventListener('input', renderCourses);
+
+function confirmLogout(event) {
+  event.preventDefault(); // Prevent immediate navigation
+  if (confirm("Are you sure you want to logout?")) {
+    window.location.href = "../Homepage/Home.html"; // Change this to your actual logout destination
+  }
+}
+</script>
+
+</body>
+</html>
