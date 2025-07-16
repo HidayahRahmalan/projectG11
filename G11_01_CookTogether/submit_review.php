@@ -30,28 +30,33 @@ if (!$rating) {
 }
 
 if (!empty($errors)) {
-    die("Error: " . implode(" ", $errors));
+    // Arahkan semula dengan mesej ralat jika input tidak sah, bukannya 'die()'.
+    header("location: recipe-details.php?id=" . ($recipe_id ?? '') . "&error=invalid_input");
+    exit();
 }
 
-// ===================== INI BAHAGIAN YANG PERLU DITAMBAH =====================
-// --- 3. CHECK FOR DUPLICATE REVIEW ---
-// Pemeriksaan ini menghalang pengguna daripada menghantar ulasan lebih dari sekali
-$sql_check = "SELECT 1 FROM reviews WHERE user_id = ? AND recipe_id = ? LIMIT 1";
-$stmt_check = $conn->prepare($sql_check);
-$stmt_check->bind_param("ii", $user_id, $recipe_id);
-$stmt_check->execute();
-$stmt_check->store_result();
 
-if ($stmt_check->num_rows > 0) {
+// --- 3. CHECK FOR DAILY REVIEW LIMIT ---
+// Pemeriksaan ini halang user daripada hantar ulasan lebih dari sekali sehari
+$sql_check_today = "SELECT review_id FROM reviews WHERE user_id = ? AND recipe_id = ? AND DATE(created_at) = CURDATE() LIMIT 1";
+if ($stmt_check = $conn->prepare($sql_check_today)) {
+    $stmt_check->bind_param("ii", $user_id, $recipe_id);
+    $stmt_check->execute();
+    $stmt_check->store_result();
+
+    // Jika ada ulasan pada hari ini (kiraan baris > 0)
+    if ($stmt_check->num_rows > 0) {
+        $stmt_check->close();
+        // Hantar pengguna kembali ke halaman resepi dengan mesej ralat yang spesifik
+        header("location: recipe-details.php?id=" . $recipe_id . "&error=daily_limit");
+        exit(); // Hentikan skrip serta-merta
+    }
     $stmt_check->close();
-    // Berhenti dan paparkan mesej ralat jika ulasan sudah wujud
-    die("Error: You have already submitted a review for this recipe.");
 }
-$stmt_check->close();
-// ===================== AKHIR BAHAGIAN TAMBAHAN =====================
 
 
 // --- 4. DATABASE TRANSACTION & FILE HANDLING ---
+
 $conn->begin_transaction();
 
 try {
@@ -63,7 +68,7 @@ try {
     $new_review_id = $conn->insert_id;
     $stmt_review->close();
 
-    // Step 4b: Handle ALL media uploads (logik ini tidak berubah)
+    // Step 4b: Handle ALL media uploads
     $upload_dir = 'uploads/review_media/';
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0755, true);
@@ -126,6 +131,9 @@ try {
 } catch (Exception $e) {
     $conn->rollback();
     error_log("Review submission failed: " . $e->getMessage());
-    die("An error occurred during submission. Details: " . $e->getMessage());
+    
+    // Arahkan semula mesej ralat jika ada masalah lain
+    header("location: recipe-details.php?id=" . $recipe_id . "&error=submission_failed");
+    exit();
 }
 ?>
