@@ -104,6 +104,7 @@ if ($stmt_reviews = $conn->prepare($sql_reviews)) {
 }
 
 
+
 $conn->close();
 ?>
 <!DOCTYPE html>
@@ -270,15 +271,13 @@ $conn->close();
         <section class="reviews-section">
             <h2 class="section-title">Reviews & Comments (<?php echo count($reviews); ?>)</h2>
             
-            
+           
             <?php if (isset($_GET['error']) && $_GET['error'] == 'daily_limit'): ?>
                 <div style="background-color: #f8d7da; color: #721c24; padding: 1rem; border: 1px solid #f5c6cb; border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
                     <strong>Action Denied:</strong> You have already submitted a review for this recipe today. Please try again tomorrow.
                 </div>
             <?php endif; ?>
             
-
-            <!-- Kod borang kini dikemas kini untuk tidak menyemak $user_has_reviewed -->
             <?php if (isset($_SESSION["loggedin"]) && $_SESSION['role'] === 'viewer'): ?>
                 <form id="review-form" action="submit_review.php" method="post" enctype="multipart/form-data">
                     <h3>Leave Your Review</h3>
@@ -409,7 +408,7 @@ $conn->close();
             }
         }
 
-        // Skrip untuk notifikasi kejayaan
+        
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             
