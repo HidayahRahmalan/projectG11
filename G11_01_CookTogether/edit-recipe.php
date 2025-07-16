@@ -42,7 +42,7 @@ $stmt_ing->execute();
 $ingredients = $stmt_ing->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt_ing->close();
 
-// --- MODIFIED: Fetch steps with their ID and image path ---
+// ---  Fetch steps with their ID and image path ---
 $steps = [];
 $sql_steps = "SELECT step_id, step_text, step_image_path FROM steps WHERE recipe_id = ? ORDER BY sort_order ASC";
 $stmt_steps = $conn->prepare($sql_steps);
@@ -111,7 +111,7 @@ $available_cuisines = $result_cuisines->fetch_all(MYSQLI_ASSOC);
         <div class="upload-section">
             <h1 class="upload-title">Edit Your Recipe</h1>
             
-            <!-- IMPORTANT: The form now points to update-recipe.php -->
+            
             <form action="update-recipe.php" method="post" enctype="multipart/form-data">
                 
                 <input type="hidden" name="recipe_id" value="<?php echo $recipe['recipe_id']; ?>">
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveButtons('#ingredientsContainer', '.dynamic-input-group');
     });
 
-    // --- Step Actions (MODIFIED) ---
+    // --- Step Actions ---
     const stepsContainer = document.getElementById('stepsContainer');
     document.getElementById('addStepBtn').addEventListener('click', function() {
         const newStep = document.createElement('div');
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
             addBtn.style.display = 'block'; // Show "Add Photo" button
             addBtn.textContent = 'Add Photo';
             
-            // CRITICAL: Clear the hidden input holding the old path.
+            
             // This tells the backend the image was removed.
             if (existingPathInput) {
                 existingPathInput.value = ''; 
