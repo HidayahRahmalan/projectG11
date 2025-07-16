@@ -83,8 +83,6 @@ $available_cuisines = $result_cuisines->fetch_all(MYSQLI_ASSOC);
       .user-info { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; color: #333; margin-right: -10px; }
       .user-name { font-weight: 600; font-size: 0.9rem; }
       .user-role { font-size: 0.75rem; color: #777; text-transform: capitalize; }
-      
-      /* --- NEW/MODIFIED CSS for Step Image Upload --- */
       .step-image-controls { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 150px; flex-shrink: 0; }
       .step-image-preview { width: 150px; height: 100px; border: 2px dashed #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: #f8f9fa; position: relative; }
       .step-image-preview img { max-width: 100%; max-height: 100%; display: block; }
@@ -156,7 +154,7 @@ $available_cuisines = $result_cuisines->fetch_all(MYSQLI_ASSOC);
                     <button type="button" class="add-step-btn" id="addIngredientBtn">+ Add Ingredient</button>
                 </div>
 
-                <!-- --- MODIFIED: Cooking Steps Section --- -->
+                <!-- --- Cooking Steps Section --- -->
                 <div class="form-section">
                     <h3 class="section-title">👨‍🍳 Cooking Steps</h3>
                     <div id="stepsContainer">
@@ -240,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveButtons('#ingredientsContainer', '.dynamic-input-group');
     });
 
-    // --- Step Actions ---
+    // --- Step Actions (MODIFIED) ---
     const stepsContainer = document.getElementById('stepsContainer');
     document.getElementById('addStepBtn').addEventListener('click', function() {
         const newStep = document.createElement('div');
