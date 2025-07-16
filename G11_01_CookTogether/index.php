@@ -238,7 +238,7 @@ $conn->close();
                                 <span class="meta-tag"><?php echo ucfirst(htmlspecialchars($recipe['difficulty'])); ?></span>
                             </div>
                             <p class="recipe-description"><?php echo htmlspecialchars(substr($recipe['description'], 0, 100)) . '...'; ?></p>
-                            <a href="recipe-details.php?id=<?php echo $recipe['recipe_id']; ?>" class="view-recipe-btn">View Recipe</a>
+                            <a href="recipe-details-viewer.php?id=<?php echo $recipe['recipe_id']; ?>" class="view-recipe-btn">View Recipe</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
