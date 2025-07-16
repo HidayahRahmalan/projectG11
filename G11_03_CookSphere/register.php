@@ -4,9 +4,9 @@ session_start();
 
 // DB configuration
 $host = 'localhost';
-$db = 'cooksphere';
-$user = 'root';
-$pass = '';
+$db = 'p25_cooksphere';
+$user = 'cooksphere';
+$pass = 'Abc123';
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
