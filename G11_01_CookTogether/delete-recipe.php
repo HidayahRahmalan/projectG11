@@ -17,11 +17,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['recipe_id'])) {
     $conn->begin_transaction();
 
     try {
-        // We will delete from all related tables first to maintain foreign key integrity.
-        // The database's "ON DELETE CASCADE" should handle this automatically,
-        // but doing it manually is safer and more explicit.
-        
-        // Note: We also need to delete the physical files from the server.
         
         // 1. Get all media files to delete them from the server
         $sql_get_media = "SELECT file_path FROM media WHERE recipe_id = ?";
