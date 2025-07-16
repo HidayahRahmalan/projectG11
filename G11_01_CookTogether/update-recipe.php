@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST" || !isset($_POST['recipe_id'])) {
 $recipe_id = (int)$_POST['recipe_id'];
 $user_id = $_SESSION['user_id'];
 $errors = [];
-$upload_dir = 'uploads/'; // ---  Define upload directory early
+$upload_dir = 'uploads/'; // ---Define upload directory early
 
 // Basic recipe info
 $recipeTitle = trim($_POST['recipeTitle'] ?? '');
@@ -93,25 +93,26 @@ try {
         throw new Exception("You do not have permission to edit this recipe.");
     }
 
-    // --- Step 4b: Update the main 'recipes' table  ---
+    // --- Step 4b: Update the main 'recipes' table ---
     $sql_update_recipe = "UPDATE recipes SET title = ?, description = ?, cuisine_id = ?, dietary_restrictions = ?, difficulty = ?, prep_time = ?, cook_time = ? WHERE recipe_id = ?";
     $stmt_update_recipe = $conn->prepare($sql_update_recipe);
     $stmt_update_recipe->bind_param("ssisssii", $recipeTitle, $recipeDescription, $final_cuisine_id, $dietaryRestrictions, $difficulty, $prepTime, $cookTime, $recipe_id);
     $stmt_update_recipe->execute();
     $stmt_update_recipe->close();
 
-    // --- Step 4c: Delete marked main media  ---
+    // --- Step 4c: Delete marked main media ---
     if (!empty($media_to_delete)) {
         // ... your existing code for deleting main media is fine ...
     }
 
-    // --- Step 4d: Upload any NEW main media files  ---
+    // --- Step 4d: Upload any NEW main media files (NO CHANGES NEEDED HERE) ---
     if (isset($_FILES['new_media']) && !empty($_FILES['new_media']['name'][0])) {
         // ... your existing code for uploading new main media is fine ...
     }
 
+    // --- Step 4e: Update ingredients and steps ---
 
-
+    // ----- INGREDIENTS: The delete-and-reinsert strategy is fine for simple text data. -----
     $stmt_del_ing = $conn->prepare("DELETE FROM ingredients WHERE recipe_id = ?");
     $stmt_del_ing->bind_param("i", $recipe_id);
     $stmt_del_ing->execute();
