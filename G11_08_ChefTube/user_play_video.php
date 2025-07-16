@@ -1,7 +1,7 @@
 <?php
 // Debug logging function
 function debug_log($message) {
-    $log_file = "C:/xampp/htdocs/cheftube/debug.log";
+    $log_file = "debug.log"; // Changed to relative path for server compatibility
     $timestamp = date('Y-m-d H:i:s');
     file_put_contents($log_file, "[$timestamp] USER_PLAY_VIDEO: $message\n", FILE_APPEND | LOCK_EX);
 }
@@ -294,6 +294,12 @@ try {
     }
     
     debug_log("Video found: " . $video['title'] . " (Likes: " . $video['like'] . ")");
+    
+    // Log the video file path for debugging
+    $video_file_path = "cc/" . $video['creator_id'] . "/video/" . $video['video'];
+    debug_log("Video file path: " . $video_file_path);
+    debug_log("Video file exists: " . (file_exists($video_file_path) ? 'YES' : 'NO'));
+    
 } catch (PDOException $e) {
     debug_log("Video fetch error: " . $e->getMessage());
     header('Location: index.php');
@@ -376,6 +382,10 @@ try {
 } catch (PDOException $e) {
     debug_log("Debug interaction fetch error: " . $e->getMessage());
 }
+
+// Get base URL for the application
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+$base_url = $protocol . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
 ?>
 
 <!DOCTYPE html>
@@ -386,8 +396,6 @@ try {
     <title><?php echo htmlspecialchars($video['title']); ?> - ChefTube Voice Control</title>
     <link rel="icon" type="image/png" href="website/icon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -482,10 +490,42 @@ try {
             position: relative;
         }
 
-        .video-js {
+        .video-player {
             width: 100%;
             height: 600px;
+            background: #000;
             border-radius: 20px;
+            object-fit: contain;
+        }
+
+        .video-error {
+            width: 100%;
+            height: 600px;
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+        }
+
+        .video-error i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #e50914;
+        }
+
+        .video-error h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .video-error p {
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.5;
         }
 
         /* Voice Control Panel Styles */
@@ -1154,7 +1194,7 @@ try {
                 width: 100%;
             }
             
-            .video-js {
+            .video-player {
                 height: 300px;
             }
             
@@ -1197,7 +1237,9 @@ try {
         User ID: <?php echo $user_id; ?><br>
         User Liked: <?php echo $user_has_liked ? 'YES' : 'NO'; ?><br>
         Video Likes: <?php echo $video['like']; ?><br>
-        Comments: <?php echo count($comments); ?>
+        Comments: <?php echo count($comments); ?><br>
+        Base URL: <?php echo $base_url; ?><br>
+        Video Path: <?php echo "cc/" . $video['creator_id'] . "/video/" . $video['video']; ?>
     </div>
 
     <!-- Continuous Mode Indicator -->
@@ -1226,17 +1268,33 @@ try {
                     <div class="voice-overlay-text" id="voiceOverlayText">Voice command recognized!</div>
                 </div>
                 
-                <video
-                    id="videoPlayer"
-                    class="video-js vjs-default-skin"
-                    controls
-                    preload="auto"
-                    data-setup="{}">
-                    <p class="vjs-no-js">
-                        To view this video please enable JavaScript, and consider upgrading to a web browser that
-                        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
-                    </p>
-                </video>
+                <?php 
+                $video_file_path = "cc/" . $video['creator_id'] . "/video/" . $video['video'];
+                
+                // Check if video file exists
+                if (file_exists($video_file_path)): ?>
+                    <video
+                        id="videoPlayer"
+                        class="video-player"
+                        controls
+                        preload="auto"
+                        poster="<?php 
+                            $thumbnail_path = "cc/" . $video['creator_id'] . "/thumbnail/" . $video['thumbnail'];
+                            echo file_exists($thumbnail_path) ? $thumbnail_path : 'website/default-thumbnail.jpg';
+                        ?>">
+                        <source src="<?php echo $video_file_path; ?>" type="video/mp4">
+                        <source src="<?php echo $video_file_path; ?>" type="video/webm">
+                        <source src="<?php echo $video_file_path; ?>" type="video/ogg">
+                        Your browser does not support the video tag.
+                    </video>
+                <?php else: ?>
+                    <div class="video-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Video Not Available</h3>
+                        <p>The video file could not be found.<br>
+                        Path: <?php echo $video_file_path; ?></p>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- Video Info -->
@@ -1458,14 +1516,14 @@ try {
         <i class="fas fa-microphone"></i>
     </button>
 
-    <!-- Video.js JavaScript -->
-    <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
     <script>
         console.log('Page loaded - Debug info:');
         console.log('Video ID:', '<?php echo $video_id; ?>');
         console.log('User ID:', '<?php echo $user_id; ?>');
         console.log('Is logged in:', <?php echo $is_logged_in ? 'true' : 'false'; ?>);
         console.log('User has liked:', <?php echo $user_has_liked ? 'true' : 'false'; ?>);
+        console.log('Video file path:', '<?php echo $video_file_path; ?>');
+        console.log('Video file exists:', <?php echo file_exists($video_file_path) ? 'true' : 'false'; ?>);
 
         // Toggle debug info with Ctrl+D
         document.addEventListener('keydown', function(e) {
@@ -1476,7 +1534,7 @@ try {
             }
         });
 
-        // Enhanced Voice Control System with Fixed Fullscreen and Continuous Mode
+        // Enhanced Voice Control System for HTML5 Video
         class VoiceControl {
             constructor() {
                 this.recognition = null;
@@ -1493,39 +1551,27 @@ try {
                 this.setupUI();
                 this.setupFullscreenListeners();
                 
-                // FIXED: Voice commands mapping (changed "unmute" to "stop mute")
+                // Voice commands mapping
                 this.commands = {
-                    // Playback controls
                     'play': ['play', 'play video', 'start', 'start video', 'begin'],
-                    'pause': ['pause', 'pause video', 'halt'],
+                    'pause': ['pause', 'pause video', 'halt', 'stop'],
                     'restart': ['restart', 'restart video', 'start over', 'begin again', 'replay'],
-                    
-                    // Volume controls
                     'volume_up': ['volume up', 'louder', 'increase volume', 'turn up'],
                     'volume_down': ['volume down', 'quieter', 'decrease volume', 'turn down'],
                     'mute': ['mute', 'silence', 'quiet', 'mute video'],
-                    'unmute': ['stop mute', 'unmute', 'sound on', 'audio on', 'turn sound on'], // FIXED: "stop mute" added as primary
-                    
-                    // Navigation
+                    'unmute': ['stop mute', 'unmute', 'sound on', 'audio on', 'turn sound on'],
                     'fullscreen': ['full screen', 'fullscreen', 'expand', 'maximize'],
                     'exit_fullscreen': ['exit full screen', 'exit fullscreen', 'minimize', 'normal screen'],
-                    
-                    // Speed controls
                     'speed_up': ['speed up', 'faster', 'increase speed'],
                     'speed_down': ['slow down', 'slower', 'decrease speed'],
                     'normal_speed': ['normal speed', 'regular speed', 'default speed'],
-                    
-                    // Seeking
                     'skip_forward': ['skip forward', 'fast forward', 'jump ahead'],
                     'skip_backward': ['skip backward', 'rewind', 'go back'],
-                    
-                    // Interface
                     'show_controls': ['show controls', 'display controls'],
                     'hide_controls': ['hide controls', 'remove controls']
                 };
             }
 
-            // FIXED: Setup fullscreen event listeners to track state properly
             setupFullscreenListeners() {
                 // Listen for fullscreen change events
                 document.addEventListener('fullscreenchange', () => {
@@ -1564,7 +1610,7 @@ try {
                 }
                 
                 // Configure speech recognition for continuous mode
-                this.recognition.continuous = true;  // Enable continuous recognition
+                this.recognition.continuous = true;
                 this.recognition.interimResults = false;
                 this.recognition.lang = 'en-US';
                 this.recognition.maxAlternatives = 1;
@@ -1599,7 +1645,7 @@ try {
                                     this.stopContinuousMode();
                                 }
                             }
-                        }, 100); // Short delay to prevent rapid restart issues
+                        }, 100);
                     } else {
                         this.updateStatus('Press \'V\' to start voice control', 'ready');
                         this.showContinuousIndicator(false);
@@ -1624,7 +1670,6 @@ try {
                     switch(event.error) {
                         case 'no-speech':
                             if (this.isContinuousMode) {
-                                // Don't show error for no-speech in continuous mode, just restart
                                 this.restartContinuousRecognition();
                                 return;
                             }
@@ -1646,7 +1691,6 @@ try {
                     }
                     
                     if (this.isContinuousMode && event.error !== 'audio-capture' && event.error !== 'not-allowed') {
-                        // Try to restart in continuous mode unless it's a permission issue
                         this.restartContinuousRecognition();
                     } else {
                         this.updateStatus(errorMessage, 'error');
@@ -1670,7 +1714,6 @@ try {
             }
             
             setupUI() {
-                // Update UI based on support
                 if (!this.isSupported) {
                     document.getElementById('voiceToggle').disabled = true;
                     document.getElementById('voiceToggle').style.opacity = '0.5';
@@ -1694,13 +1737,7 @@ try {
             
             setPlayer(player) {
                 this.player = player;
-                console.log('Video player connected to voice control');
-                
-                // FIXED: Track fullscreen state changes through Video.js events
-                player.on('fullscreenchange', () => {
-                    this.currentFullscreenState = player.isFullscreen();
-                    console.log('Video.js fullscreen state changed:', this.currentFullscreenState);
-                });
+                console.log('HTML5 video player connected to voice control');
             }
             
             startContinuousMode() {
@@ -1769,7 +1806,6 @@ try {
                     this.logCommand('unknown', recognizedText, false);
                     this.showFeedback(`❌ Command not recognized`, 'error');
                     
-                    // In continuous mode, quickly return to listening status
                     if (this.isContinuousMode) {
                         setTimeout(() => {
                             this.updateStatus('Continuous listening active - Speak commands', 'continuous');
@@ -1797,10 +1833,8 @@ try {
                             break;
                             
                         case 'restart':
-                            // FIXED: Better restart implementation
                             this.player.pause();
-                            this.player.currentTime(0);
-                            // Add a small delay to ensure the seek completes
+                            this.player.currentTime = 0;
                             setTimeout(() => {
                                 this.player.play();
                             }, 100);
@@ -1808,32 +1842,30 @@ try {
                             break;
                             
                         case 'volume_up':
-                            const currentVol = this.player.volume();
+                            const currentVol = this.player.volume;
                             const newVolUp = Math.min(currentVol + 0.2, 1);
-                            this.player.volume(newVolUp);
+                            this.player.volume = newVolUp;
                             feedbackMessage = `🔊 Volume: ${Math.round(newVolUp * 100)}%`;
                             break;
                             
                         case 'volume_down':
-                            const currentVolDown = this.player.volume();
+                            const currentVolDown = this.player.volume;
                             const newVolDown = Math.max(currentVolDown - 0.2, 0);
-                            this.player.volume(newVolDown);
+                            this.player.volume = newVolDown;
                             feedbackMessage = `🔉 Volume: ${Math.round(newVolDown * 100)}%`;
                             break;
                             
                         case 'mute':
-                            this.player.muted(true);
+                            this.player.muted = true;
                             feedbackMessage = '🔇 Video muted';
                             break;
                             
                         case 'unmute':
-                            // FIXED: Proper unmute implementation
-                            this.player.muted(false);
+                            this.player.muted = false;
                             feedbackMessage = '🔊 Video unmuted';
                             break;
                             
                         case 'fullscreen':
-                            // FIXED: Completely rewritten fullscreen logic to handle multiple calls correctly
                             console.log('Fullscreen command - Current state:', this.currentFullscreenState);
                             
                             if (this.currentFullscreenState) {
@@ -1841,32 +1873,19 @@ try {
                                 success = false;
                             } else {
                                 try {
-                                    // Method 1: Try Video.js fullscreen API first
                                     if (this.player.requestFullscreen) {
-                                        console.log('Using Video.js requestFullscreen');
                                         this.player.requestFullscreen();
-                                        feedbackMessage = '⛶ Entering fullscreen';
-                                    }
-                                    // Method 2: Try native HTML5 fullscreen API on video element
-                                    else {
-                                        console.log('Using native fullscreen API');
-                                        const videoElement = this.player.el();
-                                        
-                                        if (videoElement.requestFullscreen) {
-                                            videoElement.requestFullscreen();
-                                        } else if (videoElement.webkitRequestFullscreen) {
-                                            videoElement.webkitRequestFullscreen();
-                                        } else if (videoElement.mozRequestFullScreen) {
-                                            videoElement.mozRequestFullScreen();
-                                        } else if (videoElement.msRequestFullscreen) {
-                                            videoElement.msRequestFullscreen();
-                                        } else {
-                                            throw new Error('Fullscreen API not supported');
-                                        }
-                                        feedbackMessage = '⛶ Entering fullscreen';
+                                    } else if (this.player.webkitRequestFullscreen) {
+                                        this.player.webkitRequestFullscreen();
+                                    } else if (this.player.mozRequestFullScreen) {
+                                        this.player.mozRequestFullScreen();
+                                    } else if (this.player.msRequestFullscreen) {
+                                        this.player.msRequestFullscreen();
+                                    } else {
+                                        throw new Error('Fullscreen API not supported');
                                     }
                                     
-                                    // Update state immediately (will be confirmed by event listener)
+                                    feedbackMessage = '⛶ Entering fullscreen';
                                     setTimeout(() => {
                                         this.currentFullscreenState = true;
                                     }, 100);
@@ -1880,7 +1899,6 @@ try {
                             break;
                             
                         case 'exit_fullscreen':
-                            // FIXED: Improved exit fullscreen logic
                             console.log('Exit fullscreen command - Current state:', this.currentFullscreenState);
                             
                             if (!this.currentFullscreenState) {
@@ -1888,13 +1906,7 @@ try {
                                 success = false;
                             } else {
                                 try {
-                                    // Try Video.js exit fullscreen first
-                                    if (this.player.exitFullscreen && typeof this.player.exitFullscreen === 'function') {
-                                        console.log('Using Video.js exitFullscreen');
-                                        this.player.exitFullscreen();
-                                    }
-                                    // Fallback to native APIs
-                                    else if (document.exitFullscreen) {
+                                    if (document.exitFullscreen) {
                                         document.exitFullscreen();
                                     } else if (document.webkitExitFullscreen) {
                                         document.webkitExitFullscreen();
@@ -1905,8 +1917,6 @@ try {
                                     }
                                     
                                     feedbackMessage = '🔳 Exiting fullscreen';
-                                    
-                                    // Update state immediately (will be confirmed by event listener)
                                     setTimeout(() => {
                                         this.currentFullscreenState = false;
                                     }, 100);
@@ -1920,34 +1930,44 @@ try {
                             break;
                             
                         case 'speed_up':
-                            const currentRate = this.player.playbackRate();
+                            const currentRate = this.player.playbackRate;
                             const newRateUp = Math.min(currentRate + 0.25, 2);
-                            this.player.playbackRate(newRateUp);
+                            this.player.playbackRate = newRateUp;
                             feedbackMessage = `⚡ Speed: ${newRateUp}x`;
                             break;
                             
                         case 'speed_down':
-                            const currentRateDown = this.player.playbackRate();
+                            const currentRateDown = this.player.playbackRate;
                             const newRateDown = Math.max(currentRateDown - 0.25, 0.5);
-                            this.player.playbackRate(newRateDown);
+                            this.player.playbackRate = newRateDown;
                             feedbackMessage = `🐌 Speed: ${newRateDown}x`;
                             break;
                             
                         case 'normal_speed':
-                            this.player.playbackRate(1);
+                            this.player.playbackRate = 1;
                             feedbackMessage = '⚡ Normal speed';
                             break;
                             
                         case 'skip_forward':
-                            const currentTime = this.player.currentTime();
-                            this.player.currentTime(currentTime + 10);
+                            const currentTime = this.player.currentTime;
+                            this.player.currentTime = currentTime + 10;
                             feedbackMessage = '⏭️ Skipped forward 10s';
                             break;
                             
                         case 'skip_backward':
-                            const currentTimeBack = this.player.currentTime();
-                            this.player.currentTime(Math.max(currentTimeBack - 10, 0));
+                            const currentTimeBack = this.player.currentTime;
+                            this.player.currentTime = Math.max(currentTimeBack - 10, 0);
                             feedbackMessage = '⏮️ Skipped back 10s';
+                            break;
+                            
+                        case 'show_controls':
+                            this.player.controls = true;
+                            feedbackMessage = '🎛️ Controls shown';
+                            break;
+                            
+                        case 'hide_controls':
+                            this.player.controls = false;
+                            feedbackMessage = '🔘 Controls hidden';
                             break;
                             
                         default:
@@ -1961,7 +1981,6 @@ try {
                         this.showFeedback(feedbackMessage, 'success');
                         this.showVideoOverlay(feedbackMessage);
                         
-                        // Return to continuous listening status if in continuous mode
                         if (this.isContinuousMode) {
                             setTimeout(() => {
                                 this.updateStatus('Continuous listening active - Speak commands', 'continuous');
@@ -1977,7 +1996,6 @@ try {
                     this.showFeedback('❌ Command failed', 'error');
                     this.logCommand(action, recognizedText, false);
                     
-                    // Return to continuous listening status if in continuous mode
                     if (this.isContinuousMode) {
                         setTimeout(() => {
                             this.updateStatus('Continuous listening active - Speak commands', 'continuous');
@@ -2055,7 +2073,6 @@ try {
                 status.textContent = message;
                 status.className = `voice-status ${type}`;
                 
-                // Don't auto-clear status in continuous mode unless it's an error
                 if (type !== 'ready' && type !== 'continuous') {
                     setTimeout(() => {
                         if (status.className.includes(type) && !this.isContinuousMode) {
@@ -2106,69 +2123,58 @@ try {
             }
         }
         
-        // Initialize voice control
+        // Initialize voice control and video player
         let voiceControl;
         let player;
         const videoId = '<?php echo $video_id; ?>';
-        const videoPath = 'cc/<?php echo $video['creator_id']; ?>/video/<?php echo $video['video']; ?>';
+        const videoPath = '<?php echo $video_file_path; ?>';
+        const videoExists = <?php echo file_exists($video_file_path) ? 'true' : 'false'; ?>;
 
         console.log('Video path:', videoPath);
+        console.log('Video exists:', videoExists);
 
-        // Initialize video player when DOM is loaded
+        // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing video player');
+            console.log('DOM loaded, initializing components');
             
             // Initialize voice control
             voiceControl = new VoiceControl();
             
-            if (typeof videojs !== 'undefined') {
-                console.log('Video.js loaded successfully');
-                initializeVideoPlayer();
+            // Initialize video player if video exists
+            if (videoExists) {
+                player = document.getElementById('videoPlayer');
+                if (player) {
+                    voiceControl.setPlayer(player);
+                    console.log('HTML5 video player initialized');
+                    
+                    // Add event listeners for better debugging
+                    player.addEventListener('loadstart', () => console.log('Video: Load started'));
+                    player.addEventListener('loadeddata', () => console.log('Video: Data loaded'));
+                    player.addEventListener('loadedmetadata', () => console.log('Video: Metadata loaded'));
+                    player.addEventListener('canplay', () => console.log('Video: Can play'));
+                    player.addEventListener('canplaythrough', () => console.log('Video: Can play through'));
+                    player.addEventListener('error', (e) => console.error('Video error:', e));
+                    
+                    // Handle video load errors
+                    player.addEventListener('error', function(e) {
+                        console.error('Video loading error:', e);
+                        const errorDiv = document.querySelector('.video-error');
+                        if (errorDiv) {
+                            errorDiv.innerHTML = `
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Video Loading Error</h3>
+                                <p>Failed to load video file.<br>
+                                Please check if the file exists and is accessible.</p>
+                            `;
+                        }
+                    });
+                } else {
+                    console.error('Video player element not found');
+                }
             } else {
-                console.log('Video.js failed to load, using fallback');
-                initializeFallbackPlayer();
+                console.warn('Video file does not exist, voice control will not work');
             }
         });
-
-        function initializeVideoPlayer() {
-            try {
-                player = videojs('videoPlayer', {
-                    controls: true,
-                    responsive: true,
-                    fluid: true,
-                    playbackRates: [0.5, 1, 1.25, 1.5, 2],
-                    sources: [{
-                        src: videoPath,
-                        type: 'video/mp4'
-                    }]
-                });
-
-                player.ready(function() {
-                    console.log('Video.js player is ready');
-                    voiceControl.setPlayer(player);
-                });
-
-            } catch (error) {
-                console.error('Error initializing Video.js player:', error);
-                initializeFallbackPlayer();
-            }
-        }
-
-        function initializeFallbackPlayer() {
-            console.log('Using fallback HTML5 player');
-            const videoElement = document.getElementById('videoPlayer');
-            
-            videoElement.innerHTML = '';
-            videoElement.className = 'video-js';
-            videoElement.controls = true;
-            videoElement.style.width = '100%';
-            videoElement.style.height = '600px';
-            
-            const source = document.createElement('source');
-            source.src = videoPath;
-            source.type = 'video/mp4';
-            videoElement.appendChild(source);
-        }
         
         // UI Functions
         function toggleVoiceRecognition() {
@@ -2212,36 +2218,22 @@ try {
         // Form debugging
         document.querySelectorAll('form').forEach((form, index) => {
             console.log(`Form ${index}:`, form);
-            console.log('Form action:', form.action);
-            console.log('Form method:', form.method);
-            console.log('Form elements:', form.elements);
             
             form.addEventListener('submit', function(e) {
                 console.log('Form submitting:', this);
-                console.log('Form data:', new FormData(this));
-                
-                // Log all form data
                 const formData = new FormData(this);
                 for (let [key, value] of formData.entries()) {
                     console.log(`${key}: ${value}`);
                 }
             });
         });
-
-        // Button debugging
-        document.querySelectorAll('button').forEach((btn, index) => {
-            console.log(`Button ${index}:`, btn);
-            console.log('Button name:', btn.name);
-            console.log('Button value:', btn.value);
-            console.log('Button type:', btn.type);
-        });
         
-        console.log('🎤 Enhanced Continuous Voice Control System Loaded');
+        console.log('🎤 Enhanced HTML5 Video Voice Control System Loaded');
         console.log('📝 Press "V" key to start/stop continuous voice control');
         console.log('⏹️ Press "Escape" to stop continuous mode');
         console.log('🗣️ Available commands: play, pause, volume up/down, mute/stop mute, fullscreen, restart');
         console.log('🔄 Continuous mode: Microphone stays on and listens for multiple commands');
-        console.log('✅ FIXES: Fullscreen now works repeatedly, "unmute" changed to "stop mute", proper state tracking');
+        console.log('✅ FIXED: Using HTML5 video player instead of Video.js for better server compatibility');
     </script>
 </body>
 </html>
