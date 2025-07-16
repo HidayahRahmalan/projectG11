@@ -56,7 +56,7 @@ if($stmt_ingredients = $conn->prepare($sql_ingredients)) {
 
 // --- 5. FETCH THE COOKING STEPS ---
 $steps = [];
-$sql_steps = "SELECT step_text,  step_image_path FROM steps WHERE recipe_id = ? ORDER BY sort_order ASC";
+$sql_steps = "SELECT step_text FROM steps WHERE recipe_id = ? ORDER BY sort_order ASC";
 if($stmt_steps = $conn->prepare($sql_steps)) {
     $stmt_steps->bind_param("i", $recipe_id);
     $stmt_steps->execute();
@@ -66,6 +66,7 @@ if($stmt_steps = $conn->prepare($sql_steps)) {
 
 // --- 6. FETCH REVIEWS AND THEIR MEDIA (CORRECTED + ADDED REVIEWER_ID) ---
 $reviews = [];
+// ===================== PERUBAHAN DI SINI: TAMBAH rev.user_id AS reviewer_id =====================
 $sql_reviews = "SELECT rev.review_id, rev.rating, rev.comment, rev.created_at, u.name AS reviewer_name, rev.user_id AS reviewer_id 
                 FROM reviews rev 
                 JOIN user u ON rev.user_id = u.user_id 
@@ -103,7 +104,19 @@ if ($stmt_reviews = $conn->prepare($sql_reviews)) {
     }
 }
 
-
+$user_has_reviewed = false;
+if (isset($_SESSION['user_id'])) {
+    $sql_check_review = "SELECT 1 FROM reviews WHERE user_id = ? AND recipe_id = ? LIMIT 1";
+    if ($stmt_check = $conn->prepare($sql_check_review)) {
+        $stmt_check->bind_param("ii", $_SESSION['user_id'], $recipe_id);
+        $stmt_check->execute();
+        $stmt_check->store_result();
+        if ($stmt_check->num_rows > 0) {
+            $user_has_reviewed = true;
+        }
+        $stmt_check->close();
+    }
+}
 
 $conn->close();
 ?>
@@ -146,24 +159,13 @@ $conn->close();
         #review-form .form-label { font-weight: bold; margin-bottom: 0.5rem; display: block; }
         .auth-required-message { text-align: center; padding: 2rem; background-color: #f8f9fa; border-radius: 15px; }
         @media (max-width: 768px) { .recipe-body { grid-template-columns: 1fr; } }
-
-        .step-image {
-            width: 100%;
-            max-width: 250px;
-            height: 300px;
-            object-fit: cover;
-            display: block;
-            margin-bottom: 1rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        }
         .user-info {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            flex-direction: column; /* Stack name and role vertically */
+            align-items: flex-end;  /* Align text to the right */
             line-height: 1.2;
             color: #333;
-            margin-right: -10px;
+            margin-right: -10px; /* Bring it a bit closer to the avatar */
         }
         .user-name {
             font-weight: 600;
@@ -172,7 +174,7 @@ $conn->close();
         .user-role {
             font-size: 0.75rem;
             color: #777;
-            text-transform: capitalize;
+            text-transform: capitalize; /* Makes "chef" look like "Chef" */
         }
     </style>
 </head>
@@ -187,13 +189,15 @@ $conn->close();
     <div id="delete-success-notification" style="display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background-color: #dc3545; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; font-size: 1.1rem;">
         <i class="fas fa-trash-alt"></i> Your review has been deleted.
     </div>
+    <!-- ===================== AKHIR BAHAGIAN NOTIFIKASI ===================== -->
 
 
     <nav class="navbar">
         <div class="nav-container">
-          <a href="home.php" class="logo">🍳 CookTogether</a>
+          <a href="index.php" class="logo">🍳 CookTogether</a>
           <div class="nav-links">
-            <a class="nav-link" href="home.php">Home</a>
+            <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link" href="about.php">About Us</a>
             <?php if (isset($_SESSION["loggedin"]) && in_array($_SESSION["role"], ['chef', 'student'])): ?><a class="nav-link" href="upload.php">Upload Recipe</a><?php endif; ?>
             <?php if (isset($_SESSION["loggedin"])): ?><a class="nav-link" href="logout.php">Logout</a>
             <div class="user-avatar" title="<?php echo htmlspecialchars($_SESSION['name']); ?>"><?php echo strtoupper(substr($_SESSION["name"], 0, 1)); ?></div>
@@ -211,121 +215,56 @@ $conn->close();
             <h1 class="recipe-title"><?php echo htmlspecialchars($recipe['title']); ?></h1>
             <p class="recipe-author">
                 <?php
+                    // Start building the author byline string
                     $author_byline = "By ";
+
+                    // Add the role if they are a chef or student
                     if ($recipe['author_role'] === 'chef') {
                         $author_byline .= "Chef ";
                     } elseif ($recipe['author_role'] === 'student') {
                         $author_byline .= "Student ";
                     }
+
+                    // Add the author's name
                     $author_byline .= htmlspecialchars($recipe['author_name']);
+
+                    // Conditionally add the workplace or institution
                     if ($recipe['author_role'] === 'chef' && !empty($recipe['author_workplace'])) {
                         $author_byline .= " from " . htmlspecialchars($recipe['author_workplace']);
                     } elseif ($recipe['author_role'] === 'student' && !empty($recipe['author_institution'])) {
                         $author_byline .= " from " . htmlspecialchars($recipe['author_institution']);
                     }
+
+                    // Echo the final, complete byline
                     echo $author_byline;
                 ?>
             </p>
             <p class="recipe-description"><?php echo nl2br(htmlspecialchars($recipe['description'])); ?></p>
         </header>
 
-
-        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $recipe['author_id']): ?>
-            <div class="author-actions" style="margin-bottom: 2rem; padding: 1rem; background: #f0f2f5; border-radius: 10px; display: flex; align-items: center; gap: 1rem; border: 1px solid #e1e8ed;">
-                <h4 style="margin: 0; color: #555;">Author Actions:</h4>
-                
-                <a href="edit-recipe.php?id=<?php echo $recipe['recipe_id']; ?>" class="submit-btn" style="background: #ffc107; color: #212529; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Edit Recipe</a>
-                
-                <?php if (empty($reviews)): ?>
-                    <form action="delete-recipe.php" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this recipe? This action cannot be undone.');" style="margin: 0;">
-                        <input type="hidden" name="recipe_id" value="<?php echo $recipe['recipe_id']; ?>">
-                        <button type="submit" class="submit-btn" style="background: #dc3545; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Delete Recipe</button>
-                    </form>
-                <?php endif; ?>
-
-            </div>
-        <?php endif; ?>
+        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $recipe['author_id']): ?><div class="author-actions" style="margin-bottom: 2rem; padding: 1rem; background: #f0f2f5; border-radius: 10px; display: flex; align-items: center; gap: 1rem; border: 1px solid #e1e8ed;"><h4 style="margin: 0; color: #555;">Author Actions:</h4><a href="edit-recipe.php?id=<?php echo $recipe['recipe_id']; ?>" class="submit-btn" style="background: #ffc107; color: #212529; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Edit Recipe</a><form action="delete-recipe.php" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this recipe? This action cannot be undone.');" style="margin: 0;"><input type="hidden" name="recipe_id" value="<?php echo $recipe['recipe_id']; ?>"><button type="submit" class="submit-btn" style="background: #dc3545; padding: 0.5rem 1.5rem; font-size: 0.9rem; width: auto; margin: 0;">Delete Recipe</button></form></div><?php endif; ?>
 
         <div class="media-gallery"><?php foreach ($recipe_media as $media): ?><?php if ($media['media_type'] == 'image'): ?><img src="<?php echo htmlspecialchars($media['file_path']); ?>" alt="Recipe media for <?php echo htmlspecialchars($recipe['title']); ?>" class="recipe-main-image"><?php elseif ($media['media_type'] == 'video'): ?><div class="video-section"><video controls width="100%"><source src="<?php echo htmlspecialchars($media['file_path']); ?>" type="video/mp4">Your browser does not support the video tag.</video></div><?php endif; ?><?php endforeach; ?></div>
 
         <div class="recipe-info-bar"><div class="info-item"><h4>Prep Time</h4><p><?php echo htmlspecialchars($recipe['prep_time']); ?> min</p></div><div class="info-item"><h4>Cook Time</h4><p><?php echo htmlspecialchars($recipe['cook_time']); ?> min</p></div><div class="info-item"><h4>Total Time</h4><p><?php echo htmlspecialchars($recipe['prep_time'] + $recipe['cook_time']); ?> min</p></div><div class="info-item"><h4>Difficulty</h4><p><?php echo ucfirst(htmlspecialchars($recipe['difficulty'])); ?></p></div></div>
 
-        <div class="recipe-body"><div class="ingredients-section"><h2 class="section-title">Ingredients</h2><ul class="ingredients-list"><?php foreach ($ingredients as $ingredient): ?><li><?php echo htmlspecialchars($ingredient['ingredient_text']); ?></li><?php endforeach; ?></ul></div>
-
-           <div class="steps-section">
-                <h2 class="section-title">Instructions</h2>
-                <ol class="steps-list">
-                    <?php foreach ($steps as $step): ?>
-                        <li>
-                             <?php echo nl2br(htmlspecialchars($step['step_text'])); ?>
-                             <br>
-                            <?php if (!empty($step['step_image_path'])): ?>
-                                <img src="<?php echo htmlspecialchars($step['step_image_path']); ?>" alt="Image for recipe step" class="step-image">
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ol>
-            </div>
-        </div>
+        <div class="recipe-body"><div class="ingredients-section"><h2 class="section-title">Ingredients</h2><ul class="ingredients-list"><?php foreach ($ingredients as $ingredient): ?><li><?php echo htmlspecialchars($ingredient['ingredient_text']); ?></li><?php endforeach; ?></ul></div><div class="steps-section"><h2 class="section-title">Instructions</h2><ol class="steps-list"><?php foreach ($steps as $step): ?><li><?php echo nl2br(htmlspecialchars($step['step_text'])); ?></li><?php endforeach; ?></ol></div></div>
         
         <section class="reviews-section">
             <h2 class="section-title">Reviews & Comments (<?php echo count($reviews); ?>)</h2>
             
-           
-            <?php if (isset($_GET['error']) && $_GET['error'] == 'daily_limit'): ?>
-                <div style="background-color: #f8d7da; color: #721c24; padding: 1rem; border: 1px solid #f5c6cb; border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
-                    <strong>Action Denied:</strong> You have already submitted a review for this recipe today. Please try again tomorrow.
-                </div>
-            <?php endif; ?>
-            
-
-            <!-- Kod borang kini dikemas kini untuk tidak menyemak $user_has_reviewed -->
-            <?php if (isset($_SESSION["loggedin"]) && $_SESSION['role'] === 'viewer'): ?>
-                <form id="review-form" action="submit_review.php" method="post" enctype="multipart/form-data">
-                    <h3>Leave Your Review</h3>
-                    <input type="hidden" name="recipe_id" value="<?php echo $recipe_id; ?>">
-                    <div class="form-group">
-                        <label for="rating" class="form-label">Overall Rating *</label>
-                        <select name="rating" id="rating" class="form-input" required>
-                            <option value="">-- Select a Rating --</option>
-                            <option value="5">★★★★★ Excellent</option>
-                            <option value="4">★★★★☆ Great</option>
-                            <option value="3">★★★☆☆ Good</option>
-                            <option value="2">★★☆☆☆ Okay</option>
-                            <option value="1">★☆☆☆☆ Poor</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="comment" class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Your Comment</span>
-                            <select id="commentLanguageSelector" title="Select voice language" style="border: 1px solid #ccc; border-radius: 5px; padding: 3px 5px; font-size: 0.8rem;">
-                                <option value="ms-MY">Malay</option>
-                                <option value="en-US">English</option>
-                            </select>
-                        </label>
-                        <div style="position: relative;">
-                            <textarea name="comment" id="comment" class="form-textarea" rows="4" placeholder="Share your experience..."></textarea>
-                            <button type="button" id="voiceCommentBtn" title="Use voice to type" style="position: absolute; right: 10px; bottom: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #555;"><i class="fas fa-microphone"></i></button>
-                        </div>
-                        <p style="font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem; font-weight: normal;">Tip: You can type or click the <i class="fas fa-microphone" aria-hidden="true"></i> icon to use your voice.</p>
-                    </div>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label for="reviewPhotos" class="form-label">Add Photos</label>
-                            <input type="file" name="reviewPhotos[]" id="reviewPhotos" class="form-input" multiple accept="image/*">
-                        </div>
-                        <div class="form-group">
-                            <label for="reviewVideo" class="form-label">Add a Video</label>
-                            <input type="file" name="reviewVideo" id="reviewVideo" class="form-input" accept="video/*">
-                        </div>
-                    </div>
-                    <button type="submit" class="submit-btn" style="margin-top: 1rem;">Submit Review</button>
-                </form>
-            <?php elseif (isset($_SESSION["loggedin"]) && $_SESSION['role'] !== 'viewer'): ?>
-                <div class="auth-required-message"><h4>Only viewers can leave a review.</h4></div>
-            <?php else: ?>
-                <div class="auth-required-message"><h4><a href="login.php">Log in</a> or <a href="register_viewer.php">register</a> to leave a review.</h4></div>
-            <?php endif; ?>
+                <?php if (isset($_SESSION["loggedin"]) && $_SESSION['role'] === 'viewer' && !$user_has_reviewed): ?>
+                        <form id="review-form" action="submit_review.php" method="post" enctype="multipart/form-data">
+                            <!-- ... Kandungan borang tidak berubah ... -->
+                            <h3>Leave Your Review</h3><input type="hidden" name="recipe_id" value="<?php echo $recipe_id; ?>"><div class="form-group"><label for="rating" class="form-label">Overall Rating *</label><select name="rating" id="rating" class="form-input" required><option value="">-- Select a Rating --</option><option value="5">★★★★★ Excellent</option><option value="4">★★★★☆ Great</option><option value="3">★★★☆☆ Good</option><option value="2">★★☆☆☆ Okay</option><option value="1">★☆☆☆☆ Poor</option></select></div><div class="form-group"><label for="comment" class="form-label" style="display: flex; justify-content: space-between; align-items: center;"><span>Your Comment</span><select id="commentLanguageSelector" title="Select voice language" style="border: 1px solid #ccc; border-radius: 5px; padding: 3px 5px; font-size: 0.8rem;"><option value="ms-MY">Malay</option><option value="en-US">English</option></select></label><div style="position: relative;"><textarea name="comment" id="comment" class="form-textarea" rows="4" placeholder="Share your experience..."></textarea><button type="button" id="voiceCommentBtn" title="Use voice to type" style="position: absolute; right: 10px; bottom: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #555;"><i class="fas fa-microphone"></i></button></div><p style="font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem; font-weight: normal;">Tip: You can type or click the <i class="fas fa-microphone" aria-hidden="true"></i> icon to use your voice.</p></div><div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;"><div class="form-group"><label for="reviewPhotos" class="form-label">Add Photos</label><input type="file" name="reviewPhotos[]" id="reviewPhotos" class="form-input" multiple accept="image/*"></div><div class="form-group"><label for="reviewVideo" class="form-label">Add a Video</label><input type="file" name="reviewVideo" id="reviewVideo" class="form-input" accept="video/*"></div></div><button type="submit" class="submit-btn" style="margin-top: 1rem;">Submit Review</button>
+                        </form>
+                    <?php elseif ($user_has_reviewed): ?>
+                        <div class="auth-required-message"><h4>You have already submitted a review for this recipe.</h4></div>
+                    <?php elseif (isset($_SESSION["loggedin"]) && $_SESSION['role'] !== 'viewer'): ?>
+                        <div class="auth-required-message"><h4>Only viewers can leave a review.</h4></div>
+                    <?php else: ?>
+                        <div class="auth-required-message"><h4><a href="login.php">Log in</a> or <a href="register_viewer.php">register</a> to leave a review.</h4></div>
+                    <?php endif; ?>
                 
             <div class="existing-reviews">
                 <?php if (empty($reviews)): ?>
@@ -342,6 +281,7 @@ $conn->close();
                                 </div>
                             </div>
                             
+                            <!-- BUTANG EDIT/DELETE -->
                             <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $review['reviewer_id']): ?>
                             <div class="review-actions" style="display: flex; gap: 0.75rem;">
                                 <a href="edit_review.php?id=<?php echo $review['review_id']; ?>" title="Edit Review" style="color: #555; font-size: 0.9rem; text-decoration: none;"><i class="fas fa-edit"></i></a>
@@ -410,7 +350,7 @@ $conn->close();
             }
         }
 
-        // Skrip untuk notification
+        // Skrip untuk notifikasi kejayaan
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -437,8 +377,7 @@ $conn->close();
                 showNotification('delete-success-notification');
             }
 
-            // Clean the URL from notification parameters
-            if (urlParams.has('review_success') || urlParams.has('edit_success') || urlParams.has('delete_success') || urlParams.has('error')) {
+            if (urlParams.has('review_success') || urlParams.has('edit_success') || urlParams.has('delete_success')) {
                 const currentId = urlParams.get('id');
                 const newUrl = window.location.pathname + (currentId ? '?id=' + currentId : '');
                 window.history.replaceState({ path: newUrl }, '', newUrl);
@@ -447,3 +386,5 @@ $conn->close();
     </script>
 </body>
 </html>
+
+
