@@ -191,9 +191,9 @@ $conn->close();
 
     <nav class="navbar">
         <div class="nav-container">
-          <a href="index.php" class="logo">🍳 CookTogether</a>
+          <a href="home.php" class="logo">🍳 CookTogether</a>
           <div class="nav-links">
-            <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link" href="home.php">Home</a>
             <?php if (isset($_SESSION["loggedin"]) && in_array($_SESSION["role"], ['chef', 'student'])): ?><a class="nav-link" href="upload.php">Upload Recipe</a><?php endif; ?>
             <?php if (isset($_SESSION["loggedin"])): ?><a class="nav-link" href="logout.php">Logout</a>
             <div class="user-avatar" title="<?php echo htmlspecialchars($_SESSION['name']); ?>"><?php echo strtoupper(substr($_SESSION["name"], 0, 1)); ?></div>
