@@ -22,6 +22,7 @@ $role = $_POST['role'];
 $fullname = $conn->real_escape_string($fullname);
 $email = $conn->real_escape_string($email);
 $role = $conn->real_escape_string($role);
+$password = $conn->real_escape_string($password);
 
 // Validate role
 $allowed_roles = ['chef', 'student'];
@@ -38,13 +39,13 @@ if ($check && $check->num_rows > 0) {
 }
 
 // Hash password
-$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+//$hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // Insert new user
-$sql = "INSERT INTO user (FullName, Email, Password, Role) VALUES ('$fullname', '$email', '$hashed_password', '$role')";
+$sql = "INSERT INTO user (FullName, Email, Password, Role) VALUES ('$fullname', '$email', '$password', '$role')";
 
 if ($conn->query($sql) === TRUE) {
-    echo "<script>alert('Registration successful! You can now log in.'); window.location.href='login.html';</script>";
+    echo "<script>alert('Registration successful! You can now log in.'); window.location.href='index.html';</script>";
 } else {
     echo "<script>alert('Error during registration.'); window.history.back();</script>";
 }
