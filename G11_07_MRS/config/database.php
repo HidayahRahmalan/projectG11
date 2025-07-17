@@ -18,8 +18,4 @@ $sql = "CREATE DATABASE IF NOT EXISTS $db_name";
 if (!$conn->query($sql)) {
     die("Error creating database: " . $conn->error);
 }
-
-// Set character set
-$conn->set_charset("latin1_swedish_ci");
-
 ?> 
