@@ -422,7 +422,7 @@ $staff_id = $_SESSION['id'];
                 </a>
             </li> -->
             <li class="nav-item">
-                <a href="staff_profile1.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'staff_profile1.php' ? 'active' : ''; ?>">
+                <a href="staff_profile.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'staff_profile1.php' ? 'active' : ''; ?>">
                     <i class="nav-icon bi bi-person"></i>
                     <span class="nav-text">Profile</span>
                 </a>
