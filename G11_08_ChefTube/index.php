@@ -10,7 +10,6 @@ $is_creator_logged_in = isset($_SESSION['creator_id']);
 // Get user/creator info if logged in
 $logged_in_user = null;
 $logged_in_creator = null;
-$user_pfp_path = 'website/default_avatar.png';
 
 if ($is_user_logged_in) {
     $logged_in_user = [
@@ -18,10 +17,6 @@ if ($is_user_logged_in) {
         'username' => $_SESSION['user_username'] ?? 'User',
         'email' => $_SESSION['user_email'] ?? ''
     ];
-    
-    // Try to get user profile picture (if implemented in future)
-    // For now, use default avatar
-    $user_pfp_path = 'website/default_avatar.png';
 }
 
 if ($is_creator_logged_in) {
@@ -31,12 +26,6 @@ if ($is_creator_logged_in) {
         'name' => $_SESSION['creator_name'] ?? 'Creator',
         'email' => $_SESSION['creator_email'] ?? ''
     ];
-    
-    // Get creator profile picture
-    $creator_pfp_path = "cc/" . $_SESSION['creator_id'] . "/pfp/pfp.png";
-    if (file_exists($creator_pfp_path)) {
-        $user_pfp_path = $creator_pfp_path;
-    }
 }
 
 // Get search query and filters
@@ -367,26 +356,21 @@ try {
             background: linear-gradient(45deg, #4fc3f7, #065fd4);
         }
 
+        .auth-btn.developer {
+            background: linear-gradient(45deg, #8e44ad, #9b59b6);
+            border-color: transparent;
+        }
+
+        .auth-btn.developer:hover {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+        }
+
         /* User Profile Section */
         .user-profile {
             display: flex;
             align-items: center;
             gap: 15px;
             position: relative;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .user-avatar:hover {
-            border-color: rgba(229, 9, 20, 0.5);
-            transform: scale(1.1);
         }
 
         .user-info {
@@ -890,10 +874,12 @@ try {
         </div>
 
         <div class="header-right">
+            <!-- Meet Developer button - always visible -->
+            <a href="developer.php" class="auth-btn developer">Meet Developer</a>
+            
             <?php if ($is_user_logged_in || $is_creator_logged_in): ?>
                 <!-- User is logged in -->
                 <div class="user-profile">
-                    <img src="<?php echo htmlspecialchars($user_pfp_path); ?>" alt="Profile" class="user-avatar">
                     <div class="user-info">
                         <div class="user-name">
                             <?php 
@@ -930,9 +916,6 @@ try {
                                 <a href="user_profile.php" class="dropdown-item">
                                     <i class="fas fa-user"></i> My Profile
                                 </a>
-                                <a href="user_favorites.php" class="dropdown-item">
-                                    <i class="fas fa-heart"></i> Favorites
-                                </a>
                                 <a href="cc_register.php" class="dropdown-item">
                                     <i class="fas fa-video"></i> Become a Creator
                                 </a>
@@ -958,10 +941,7 @@ try {
                class="tab-item <?php echo $current_tab === 'latest' ? 'active' : ''; ?>">
                 <i class="fas fa-clock"></i> Latest
             </a>
-            <a href="?<?php echo http_build_query(array_merge($_GET, ['tab' => 'trending'])); ?>" 
-               class="tab-item <?php echo $current_tab === 'trending' ? 'active' : ''; ?>">
-                <i class="fas fa-fire"></i> Trending
-            </a>
+            
             <a href="?<?php echo http_build_query(array_merge($_GET, ['tab' => 'most_viewed'])); ?>" 
                class="tab-item <?php echo $current_tab === 'most_viewed' ? 'active' : ''; ?>">
                 <i class="fas fa-eye"></i> Most Viewed
