@@ -393,7 +393,7 @@ $staff_id = $_SESSION['id'];
                     <i class="bi bi-person"></i>
                 <?php endif; ?>
             </a>
-            <a href="staff_profile1.php" class="username"><?php echo htmlspecialchars($_SESSION['name']); ?></a>
+            <a href="staff_profile.php" class="username"><?php echo htmlspecialchars($_SESSION['name']); ?></a>
             <?php else: ?>
             <div class="profile-pic">
                 <i class="bi bi-person"></i>
