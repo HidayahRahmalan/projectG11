@@ -18,4 +18,10 @@ $sql = "CREATE DATABASE IF NOT EXISTS $db_name";
 if (!$conn->query($sql)) {
     die("Error creating database: " . $conn->error);
 }
+
+// Select the database
+if (!$conn->select_db($db_name)) {
+    die("Error selecting database$db_name': " . $conn->error);
+}
+
 ?> 
