@@ -1,8 +1,8 @@
 <?php
 // Database configuration
 $db_host = "localhost";
-$db_user = "root";
-$db_password = "";
+$db_user = "mrs";
+$db_password = "12345";
 $db_name = "p25_maintenance_db";
 
 // Create connection without database selection
