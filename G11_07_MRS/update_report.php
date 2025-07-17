@@ -19,14 +19,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 
-    // Evidence is only required for "Completed"
-    $requireEvidence = $status === "Completed";
+    // // Evidence is only required for "Completed"
+    // $requireEvidence = $status === "Completed";
 
-    if ($requireEvidence && (!isset($_FILES['evidence']) || empty($_FILES['evidence']['name'][0]))) {
-        $_SESSION['status_error'] = "Please upload at least one file as evidence for Completed status.";
-        header("Location: report_management.php");
-        exit();
-    }
+    // if ($requireEvidence && (!isset($_FILES['evidence']) || empty($_FILES['evidence']['name'][0]))) {
+    //     $_SESSION['status_error'] = "Please upload at least one file as evidence for Completed status.";
+    //     header("Location: report_management.php");
+    //     exit();
+    // }
 
     // Define upload directory
     define('UPLOAD_PATH', 'assets/evidence/');
