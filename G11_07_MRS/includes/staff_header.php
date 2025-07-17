@@ -384,7 +384,7 @@ $staff_id = $_SESSION['id'];
 
         <div class="profile-section">
             <?php if ($_SESSION['role'] === 'Staff'): ?>
-            <a href="staff_profile1.php" class="profile-pic">
+            <a href="staff_profile.php" class="profile-pic">
                 <?php if (isset($_SESSION['profile_picture']) && !empty($_SESSION['profile_picture'])): ?>
                     <img src="uploads/profile_pictures/<?php echo htmlspecialchars($_SESSION['profile_picture']); ?>" 
                          alt="Profile Picture"
