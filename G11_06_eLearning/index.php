@@ -191,10 +191,10 @@
     <div class="hero-text">
       <h1>"Learn Anywhere. Succeed Everywhere."</h1>
       <p>E-learning lets you learn anytime, anywhere. You can study at your own pace, choose what you want to learn, and do it all from the comfort of your home or on the go. It’s a flexible, easy way to grow your skills and knowledge.</p>
-      <a href="../auth/register.html" class="cta-btn">Sign up</a>
+      <a href="auth/register.html" class="cta-btn">Sign up</a>
     </div>
     <div class="hero-image">
-      <img src="../img/stack-of-books.png" alt="3D Illustration" />
+      <img src="img/stack-of-books.png" alt="3D Illustration" />
     </div>
   </section>
 
