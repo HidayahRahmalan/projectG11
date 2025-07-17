@@ -1,136 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Our Project Hub</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap');
-        :root {
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --radius: 1rem;
-            --main-color: #4a90e2;
-        }
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        html, body {
-            height: 100%;
-            font-family: 'Montserrat', sans-serif;
-            color: #1a1a1a;
-        }
-        body {
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-            position: relative;
-            overflow-x: hidden;
-        }
-        body::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: url('images/background-pattern.png') center/cover no-repeat;
-            opacity: 0.15;
-            filter: blur(2px);
-            z-index: -1;
-        }
-        header {
-            text-align: center;
-            padding: 2rem 1rem;
-        }
-        header h1 {
-            font-weight: 600;
-            font-size: 2.75rem;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        header p {
-            font-size: 1.2rem;
-            color: #f4f4f4;
-            margin-top: 0.5rem;
-        }
-        .team-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 2rem auto;
-            flex-direction: column;
-        }
-        .team-image {
-            width: 280px;
-            height: auto;
-            border-radius: 1rem;
-            object-fit: contain;
-            border: 6px solid white;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2rem;
-            width: 90%;
-            max-width: 1200px;
-            margin: 2rem auto;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            text-decoration: none;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
-        }
-        .card img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-        }
-        .card-content {
-            padding: 1.25rem;
-        }
-        .card h2 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-        .card p {
-            font-size: 0.95rem;
-            color: #555;
-        }
-        footer {
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.9rem;
-            color: #ffffffcc;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Homepage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9f9fc;
+      color: #1e1e1e;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #eee;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ea4c89;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+      font-size: 16px;
+    }
+
+    nav a {
+      color: #333;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: #ea4c89;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .auth-buttons a {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .sign-in {
+      color: #333;
+    }
+
+    .sign-up {
+      background-color: #ea4c89;
+      color: #fff;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 80px 60px;
+      flex-wrap: wrap;
+    }
+
+    .hero-text {
+      max-width: 500px;
+    }
+
+    .hero-text h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .hero-text p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .hero-text .cta-btn {
+      background-color: #ea4c89;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    .hero-image img {
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      width: 80%;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 15px;
+    }
+
+    .modal-content a {
+      margin-top: 20px;
+      display: inline-block;
+      background: #ea4c89;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .modal-close {
+      margin-top: 10px;
+      cursor: pointer;
+      color: #999;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .hero-text {
+        margin-bottom: 40px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Our Project Showcase</h1>
-        <p>Explore our featured projects and meet our wonderful team</p>
-    </header>
 
-    <section class="team-section">
-        <img class="team-image" src="images/kamiGeng.jpeg" alt="Team Member">
-        <p style="margin-top: 1rem; font-weight: 600; color: white;">Student BITD Gempak</p>
-    </section>
+  <header>
+    <div class="logo">E-Learning</div>
+    <nav>
+      <ul>
+        <li><a href="#" class="protected-link">Home</a></li>
+        <li><a href="#" class="protected-link">Modules</a></li>
+      </ul>
+    </nav>
+    <div class="auth-buttons">
+      <a href="auth/login.html" class="sign-in">Sign in</a>
+      <a href="auth/register.html" class="sign-up">Sign up</a>
+    </div>
+  </header>
 
-    <main class="grid">
- 
- 
- 
-    </main>
+  <section class="hero">
+    <div class="hero-text">
+      <h1>"Learn Anywhere. Succeed Everywhere."</h1>
+      <p>E-learning lets you learn anytime, anywhere. You can study at your own pace, choose what you want to learn, and do it all from the comfort of your home or on the go. It’s a flexible, easy way to grow your skills and knowledge.</p>
+      <a href="../auth/register.html" class="cta-btn">Sign up</a>
+    </div>
+    <div class="hero-image">
+      <img src="../img/stack-of-books.png" alt="3D Illustration" />
+    </div>
+  </section>
 
-    <footer>
-        &copy; <?= date('Y') ?> Project Team. All rights reserved.
-    </footer>
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <h3>Please login to access this feature.</h3>
+      <a href="auth/login.html">Login</a>
+      <span class="modal-close">Cancel</span>
+    </div>
+  </div>
+
+  <script>
+    const links = document.querySelectorAll('.protected-link');
+    const modal = document.getElementById('loginModal');
+    const closeBtn = document.querySelector('.modal-close');
+
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.style.display = 'flex';
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+
 </body>
 </html>
